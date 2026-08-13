@@ -129,12 +129,16 @@ function renderProducts() {
 
         return `<div class="product-card" id="product-${product.id}">
             ${hasDiscount ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
-            ${product.image_url
-                ? `<img class="product-image" src="${product.image_url}" alt="${product.name}" loading="lazy">`
-                : `<div class="product-image-placeholder">🏺</div>`
-            }
+            
+            <a href="./product.html?id=${product.id}" style="display:block;">
+                ${product.image_url
+                    ? `<img class="product-image" src="${product.image_url}" alt="${product.name}" loading="lazy">`
+                    : `<div class="product-image-placeholder">🏺</div>`
+                }
+            </a>
+            
             <div class="product-info">
-                <div class="product-name">${product.name}</div>
+                <a href="./product.html?id=${product.id}" class="product-name" style="text-decoration:none; color:inherit;">${product.name}</a>
                 <div class="product-price-row">
                     <span class="product-price">${formatPrice(displayPrice)}</span>
                     ${hasDiscount ? `<span class="product-original-price">${formatPrice(product.price)}</span>` : ''}
