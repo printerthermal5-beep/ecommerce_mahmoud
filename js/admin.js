@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadCategoriesForSelect();
     
     document.getElementById('product-form').addEventListener('submit', handleProductSubmit);
+    
+    const catForm = document.getElementById('category-form');
+    if(catForm) catForm.addEventListener('submit', handleCategorySubmit);
 });
 
 // --- Tab Switching ---
@@ -28,6 +31,7 @@ function switchTab(tabId) {
 
     if (tabId === 'orders') loadOrders();
     if (tabId === 'products') loadAdminProducts();
+    if (tabId === 'categories') loadAdminCategories();
 }
 
 // --- Dashboard Stats ---
@@ -214,6 +218,85 @@ async function deleteProduct(id) {
             showToast('تم الحذف');
             loadAdminProducts();
             loadDashboardStats();
+        }
+    }
+}
+
+// --- Categories Management ---
+async function loadAdminCategories() {
+    const tbody = document.getElementById('categories-tbody');
+    const { data } = await db.from('categories').select('*').order('sort_order', { ascending: true });
+    
+    if(!data) return;
+
+    tbody.innerHTML = data.map(cat => `
+        <tr>
+            <td>${cat.name}</td>
+            <td style="font-size: 1.5rem;">${cat.icon || '📁'}</td>
+            <td>${cat.is_active ? '✅' : '❌'}</td>
+            <td>
+                <button class="btn-secondary" style="padding: 4px 8px;" onclick="deleteCategory('${cat.id}')">حذف</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openCategoryModal() {
+    document.getElementById('category-form').reset();
+    document.getElementById('cat-id').value = '';
+    document.getElementById('cat-modal-title').textContent = 'إضافة قسم جديد';
+    document.getElementById('category-modal').classList.add('show');
+}
+
+async function handleCategorySubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = 'جاري الحفظ... ⏳';
+
+    const id = document.getElementById('cat-id').value;
+    
+    const catData = {
+        name: document.getElementById('cat-name').value,
+        icon: document.getElementById('cat-icon').value,
+        is_active: true
+    };
+
+    try {
+        let error;
+        if (id) {
+            const res = await db.from('categories').update(catData).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await db.from('categories').insert([catData]);
+            error = res.error;
+        }
+
+        if (error) throw error;
+
+        showToast('تم الحفظ بنجاح');
+        closeModal('category-modal');
+        loadAdminCategories();
+        loadCategoriesForSelect(); // refresh dropdowns
+    } catch (err) {
+        console.error('Error saving category:', err);
+        showToast('حدث خطأ أثناء الحفظ', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+async function deleteCategory(id) {
+    if(confirm('هل أنت متأكد من حذف هذا القسم؟ سيؤدي هذا إلى إلغاء تصنيف المنتجات التابعة له!')) {
+        const { error } = await db.from('categories').delete().eq('id', id);
+        if(!error) {
+            showToast('تم الحذف');
+            loadAdminCategories();
+            loadCategoriesForSelect();
+        } else {
+            showToast('حدث خطأ أثناء الحذف', 'error');
         }
     }
 }
