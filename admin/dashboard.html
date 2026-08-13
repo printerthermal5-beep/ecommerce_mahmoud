@@ -51,6 +51,21 @@
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .modal-close { background: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .admin-layout { flex-direction: column; }
+            .sidebar { width: 100%; border-left: none; border-bottom: 1px solid var(--border); padding: 16px 0; flex-direction: column; }
+            .sidebar-brand { text-align: center; margin-bottom: 16px; }
+            .nav-links-container { display: flex; overflow-x: auto; padding: 0 16px; gap: 8px; scrollbar-width: none; }
+            .nav-links-container::-webkit-scrollbar { display: none; }
+            .nav-link { border-right: none; padding: 10px 16px; white-space: nowrap; border-radius: var(--radius-md); border: 1px solid var(--border); }
+            .nav-link.active, .nav-link:hover { border-color: var(--gold); }
+            .main-content { padding: 16px; }
+            .data-table-wrapper { overflow-x: auto; margin-top: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); }
+            .data-table { margin-top: 0; min-width: 600px; }
+            .modal-content { padding: 24px 16px; }
+        }
     </style>
 </head>
 <body>
@@ -58,12 +73,13 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-brand">النور للأنتيكات <span>⚙️</span></div>
-            <a class="nav-link active" onclick="switchTab('dashboard')">📊 لوحة التحكم</a>
-            <a class="nav-link" onclick="switchTab('orders')">📦 الطلبات</a>
-            <a class="nav-link" onclick="switchTab('products')">🏺 المنتجات</a>
-            <a class="nav-link" onclick="switchTab('categories')">📁 التصنيفات</a>
-            <div style="flex:1"></div>
-            <a class="nav-link" onclick="logout()" style="color: var(--error);">🚪 تسجيل الخروج</a>
+            <div class="nav-links-container">
+                <a class="nav-link active" onclick="switchTab('dashboard')">📊 لوحة التحكم</a>
+                <a class="nav-link" onclick="switchTab('orders')">📦 الطلبات</a>
+                <a class="nav-link" onclick="switchTab('products')">🏺 المنتجات</a>
+                <a class="nav-link" onclick="switchTab('categories')">📁 التصنيفات</a>
+                <a class="nav-link" onclick="logout()" style="color: var(--error);">🚪 تسجيل الخروج</a>
+            </div>
         </aside>
 
         <!-- Main Content -->
@@ -91,64 +107,70 @@
             <!-- Orders Tab -->
             <div id="tab-orders" class="tab-content" style="display: none;">
                 <h2>إدارة الطلبات</h2>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>رقم الطلب</th>
-                            <th>العميل</th>
-                            <th>الإجمالي</th>
-                            <th>التاريخ</th>
-                            <th>الحالة</th>
-                            <th>إجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="orders-tbody">
-                        <!-- Orders inserted here -->
-                    </tbody>
-                </table>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>العميل</th>
+                                <th>الإجمالي</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody">
+                            <!-- Orders inserted here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Products Tab -->
             <div id="tab-products" class="tab-content" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
                     <h2>إدارة المنتجات</h2>
                     <button class="btn-primary" style="width: auto;" onclick="openProductModal()">+ إضافة منتج</button>
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>المنتج</th>
-                            <th>السعر</th>
-                            <th>التصنيف</th>
-                            <th>متاح</th>
-                            <th>إجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="products-tbody">
-                        <!-- Products inserted here -->
-                    </tbody>
-                </table>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th>السعر</th>
+                                <th>التصنيف</th>
+                                <th>متاح</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody">
+                            <!-- Products inserted here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Categories Tab -->
             <div id="tab-categories" class="tab-content" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
                     <h2>إدارة التصنيفات (الأقسام)</h2>
                     <button class="btn-primary" style="width: auto;" onclick="openCategoryModal()">+ إضافة قسم</button>
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>القسم</th>
-                            <th>الأيقونة/الإيموجي</th>
-                            <th>مفعل</th>
-                            <th>إجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="categories-tbody">
-                        <!-- Categories inserted here -->
-                    </tbody>
-                </table>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>القسم</th>
+                                <th>الأيقونة/الإيموجي</th>
+                                <th>مفعل</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categories-tbody">
+                            <!-- Categories inserted here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
         </main>
