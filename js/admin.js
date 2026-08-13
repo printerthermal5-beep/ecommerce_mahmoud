@@ -137,33 +137,73 @@ function closeModal(modalId) {
 
 async function handleProductSubmit(e) {
     e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = 'جاري الحفظ... ⏳';
+
     const id = document.getElementById('prod-id').value;
+    const fileInput = document.getElementById('prod-image-file');
     
-    const productData = {
-        name: document.getElementById('prod-name').value,
-        price: document.getElementById('prod-price').value,
-        category_id: document.getElementById('prod-category').value,
-        description: document.getElementById('prod-desc').value,
-        image_url: document.getElementById('prod-image').value || null,
-        is_available: true
-    };
+    let imageUrl = null;
 
-    let error;
-    if (id) {
-        const res = await db.from('products').update(productData).eq('id', id);
-        error = res.error;
-    } else {
-        const res = await db.from('products').insert([productData]);
-        error = res.error;
-    }
+    try {
+        // 1. Upload Image if a new file is selected
+        if (fileInput.files && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+            const filePath = `products/${fileName}`;
 
-    if (error) {
-        showToast('حدث خطأ أثناء الحفظ', 'error');
-    } else {
+            btn.innerHTML = 'جاري رفع الصورة... ⏳';
+            const { error: uploadError } = await db.storage
+                .from('products')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            // Get public URL
+            const { data: { publicUrl } } = db.storage
+                .from('products')
+                .getPublicUrl(filePath);
+            
+            imageUrl = publicUrl;
+        }
+
+        const productData = {
+            name: document.getElementById('prod-name').value,
+            price: document.getElementById('prod-price').value,
+            category_id: document.getElementById('prod-category').value,
+            description: document.getElementById('prod-desc').value,
+            is_available: true
+        };
+
+        // Only update image_url if a new one was uploaded
+        if (imageUrl) {
+            productData.image_url = imageUrl;
+        }
+
+        let error;
+        if (id) {
+            const res = await db.from('products').update(productData).eq('id', id);
+            error = res.error;
+        } else {
+            const res = await db.from('products').insert([productData]);
+            error = res.error;
+        }
+
+        if (error) throw error;
+
         showToast('تم الحفظ بنجاح');
         closeModal('product-modal');
         loadAdminProducts();
         loadDashboardStats();
+    } catch (err) {
+        console.error('Error saving product:', err);
+        showToast('حدث خطأ أثناء الحفظ', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
     }
 }
 

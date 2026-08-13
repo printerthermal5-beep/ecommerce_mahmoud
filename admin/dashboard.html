@@ -159,8 +159,9 @@
                     <textarea id="prod-desc" class="form-textarea"></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">رابط الصورة (مؤقتاً)</label>
-                    <input type="url" id="prod-image" class="form-input">
+                    <label class="form-label">صورة المنتج</label>
+                    <input type="file" id="prod-image-file" class="form-input" accept="image/png, image/jpeg, image/webp">
+                    <small style="color: var(--text-muted); font-size: 0.75rem;">سيتم رفع الصورة على سيرفرات Supabase</small>
                 </div>
                 <button type="submit" class="btn-primary">حفظ المنتج</button>
             </form>
