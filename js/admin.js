@@ -100,7 +100,7 @@ async function loadCategoriesForSelect() {
     if (data) {
         adminCategories = data;
         const select = document.getElementById('prod-category');
-        select.innerHTML = data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        select.innerHTML = '<option value="">بدون قسم (منتج عام)</option>' + data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
     }
 }
 
@@ -174,10 +174,11 @@ async function handleProductSubmit(e) {
             imageUrl = publicUrl;
         }
 
+        const catValue = document.getElementById('prod-category').value;
         const productData = {
             name: document.getElementById('prod-name').value,
             price: document.getElementById('prod-price').value,
-            category_id: document.getElementById('prod-category').value,
+            category_id: catValue ? catValue : null,
             description: document.getElementById('prod-desc').value,
             is_available: true
         };
@@ -273,7 +274,10 @@ async function handleCategorySubmit(e) {
             error = res.error;
         }
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase Error:', error);
+            throw error;
+        }
 
         showToast('تم الحفظ بنجاح');
         closeModal('category-modal');
@@ -281,7 +285,7 @@ async function handleCategorySubmit(e) {
         loadCategoriesForSelect(); // refresh dropdowns
     } catch (err) {
         console.error('Error saving category:', err);
-        showToast('حدث خطأ أثناء الحفظ', 'error');
+        showToast(err.message || 'حدث خطأ أثناء الحفظ', 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;
