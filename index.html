@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>متجر النور | كماليات وأنتيكات</title>
+    <meta name="description" content="متجر النور لبيع أفخم الكماليات والأنتيكات والتحف والفازات">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0A0A0F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+        <span>✨ أهلاً بكم في متجر النور - وجهتكم الأولى لأفخم الأنتيكات والكماليات ✨</span>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <h1 class="header-title">النور للأنتيكات</h1>
+        <div class="header-actions">
+            <a href="/cart.html" class="header-btn">
+                🛒
+                <span class="cart-badge">0</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-content">
+        <!-- Hero Banner -->
+        <div class="hero-banner animate-in">
+            <h2>أضف لمسة من الفخامة<br>لمنزلك</h2>
+            <p>اكتشف تشكيلتنا الحصرية من التحف والفازات النادرة</p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container animate-in" style="animation-delay: 0.1s;">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="ابحث عن تحف، فازات، كماليات...">
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <section class="categories-section animate-in" style="animation-delay: 0.2s;">
+            <h2 class="section-title">التصنيفات</h2>
+            <div class="categories-scroll" id="categories-scroll">
+                <!-- Categories loaded dynamically -->
+                <div class="skeleton skeleton-text" style="width: 100px; height: 35px; border-radius: 20px;"></div>
+                <div class="skeleton skeleton-text" style="width: 100px; height: 35px; border-radius: 20px;"></div>
+                <div class="skeleton skeleton-text" style="width: 100px; height: 35px; border-radius: 20px;"></div>
+            </div>
+        </section>
+
+        <!-- Products -->
+        <section class="products-section animate-in" style="animation-delay: 0.3s;">
+            <h2 class="section-title">أحدث المنتجات</h2>
+            <div class="products-grid" id="products-grid">
+                <!-- Products loaded dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- PWA Install Banner -->
+    <div class="install-banner" id="install-banner">
+        <div class="install-banner-icon">📱</div>
+        <div class="install-banner-text">
+            <h4>ثبت التطبيق الآن!</h4>
+            <p>احصل على تجربة تسوق أسرع وأفضل</p>
+        </div>
+        <button class="install-btn" onclick="installPWA()">تثبيت</button>
+        <button class="install-close" onclick="dismissInstallBanner()">✕</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="/" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>الرئيسية</span>
+        </a>
+        <a href="/cart.html" class="nav-item">
+            <span class="nav-icon">🛒</span>
+            <span>السلة</span>
+            <span class="nav-badge cart-badge">0</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/store.js"></script>
+</body>
+</html>

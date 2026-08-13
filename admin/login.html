@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | إدارة متجر النور</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { display: flex; align-items: center; justify-content: center; background: var(--bg-primary); }
+        .login-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 32px; width: 100%; max-width: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+        .login-header { text-align: center; margin-bottom: 24px; }
+        .login-header h1 { color: var(--gold); font-size: 1.5rem; margin-bottom: 8px; }
+        .login-header p { color: var(--text-secondary); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="login-card animate-in">
+        <div class="login-header">
+            <h1>إدارة متجر النور</h1>
+            <p>سجل دخول للوصول للوحة التحكم</p>
+        </div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label class="form-label">البريد الإلكتروني</label>
+                <input type="email" id="email" class="form-input" style="direction: ltr;" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">كلمة المرور</label>
+                <input type="password" id="password" class="form-input" style="direction: ltr;" required>
+            </div>
+            
+            <button type="submit" class="btn-primary" id="login-btn" style="margin-top: 24px;">
+                تسجيل الدخول
+            </button>
+        </form>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script>
+        // Admin Auth Check
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await db.auth.getSession();
+            if (session) {
+                window.location.href = '/admin/dashboard.html';
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.textContent = 'جاري تسجيل الدخول...';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                showToast('خطأ في البريد أو كلمة المرور', 'error');
+                btn.disabled = false;
+                btn.textContent = 'تسجيل الدخول';
+            } else {
+                window.location.href = '/admin/dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

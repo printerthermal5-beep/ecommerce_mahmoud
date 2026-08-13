@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | متجر النور</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 250px; background: var(--bg-card); border-left: 1px solid var(--border);
+            padding: 24px 0; display: flex; flex-direction: column;
+        }
+        .sidebar-brand { padding: 0 24px; margin-bottom: 32px; font-size: 1.2rem; font-weight: 700; color: var(--gold); }
+        .nav-link {
+            padding: 12px 24px; color: var(--text-secondary); display: flex; align-items: center; gap: 12px;
+            transition: var(--transition); border-right: 3px solid transparent; cursor: pointer;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: rgba(200,164,92,0.1); color: var(--gold); border-right-color: var(--gold);
+        }
+        .main-content { flex: 1; padding: 32px; background: var(--bg-primary); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 24px; display: flex; flex-direction: column;
+        }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-en); margin-top: 8px; }
+        .stat-label { color: var(--text-secondary); font-size: 0.9rem; }
+        
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+        .data-table th, .data-table td { padding: 16px; text-align: right; border-bottom: 1px solid var(--border); }
+        .data-table th { color: var(--text-secondary); font-weight: 600; font-size: 0.85rem; }
+        .data-table tr:hover { background: var(--bg-elevated); }
+        
+        .status-badge {
+            padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;
+        }
+        .status-pending { background: rgba(255,193,7,0.1); color: var(--warning); }
+        .status-confirmed { background: rgba(76,175,80,0.1); color: var(--success); }
+        
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 32px; width: 100%; max-width: 500px;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .modal-close { background: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">النور للأنتيكات <span>⚙️</span></div>
+            <a class="nav-link active" onclick="switchTab('dashboard')">📊 لوحة التحكم</a>
+            <a class="nav-link" onclick="switchTab('orders')">📦 الطلبات</a>
+            <a class="nav-link" onclick="switchTab('products')">🏺 المنتجات</a>
+            <a class="nav-link" onclick="switchTab('categories')">📁 التصنيفات</a>
+            <div style="flex:1"></div>
+            <a class="nav-link" onclick="logout()" style="color: var(--error);">🚪 تسجيل الخروج</a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content">
+                <h2 style="margin-bottom: 24px;">نظرة عامة</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">إجمالي الطلبات</span>
+                        <span class="stat-value" id="stat-orders">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">المبيعات</span>
+                        <span class="stat-value" id="stat-sales" style="color: var(--gold);">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">المنتجات</span>
+                        <span class="stat-value" id="stat-products">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="tab-orders" class="tab-content" style="display: none;">
+                <h2>إدارة الطلبات</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الطلب</th>
+                            <th>العميل</th>
+                            <th>الإجمالي</th>
+                            <th>التاريخ</th>
+                            <th>الحالة</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-tbody">
+                        <!-- Orders inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="tab-products" class="tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2>إدارة المنتجات</h2>
+                    <button class="btn-primary" style="width: auto;" onclick="openProductModal()">+ إضافة منتج</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>المنتج</th>
+                            <th>السعر</th>
+                            <th>التصنيف</th>
+                            <th>متاح</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-tbody">
+                        <!-- Products inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">إضافة منتج</h3>
+                <button class="modal-close" onclick="closeModal('product-modal')">✕</button>
+            </div>
+            <form id="product-form">
+                <input type="hidden" id="prod-id">
+                <div class="form-group">
+                    <label class="form-label">اسم المنتج</label>
+                    <input type="text" id="prod-name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">السعر (ج.م)</label>
+                    <input type="number" id="prod-price" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">التصنيف</label>
+                    <select id="prod-category" class="form-input" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الوصف</label>
+                    <textarea id="prod-desc" class="form-textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رابط الصورة (مؤقتاً)</label>
+                    <input type="url" id="prod-image" class="form-input">
+                </div>
+                <button type="submit" class="btn-primary">حفظ المنتج</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>السلة | متجر النور</title>
+    <meta name="theme-color" content="#0A0A0F">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="back-header" style="margin: 0; padding: 0;">
+            <a href="/" class="back-btn">➔</a>
+            <h1 class="page-title">سلة المشتريات</h1>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="clearCartConfirm()" style="color: var(--error); border-color: rgba(255,82,82,0.3);">
+                🗑️
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-content cart-page" style="padding-bottom: calc(var(--bottom-nav-h) + 80px);">
+        <div id="cart-items-container">
+            <!-- Cart items loaded dynamically -->
+        </div>
+
+        <div id="cart-summary-container" style="display: none;">
+            <div class="cart-summary animate-in" style="animation-delay: 0.2s;">
+                <div class="cart-summary-row">
+                    <span>المجموع الفرعي</span>
+                    <span class="price" id="subtotal-price">0 ج.م</span>
+                </div>
+                <div class="cart-summary-row">
+                    <span>رسوم التوصيل</span>
+                    <span class="price">مجاناً</span>
+                </div>
+                <div class="cart-summary-row total">
+                    <span>الإجمالي</span>
+                    <span class="price" id="total-price">0 ج.م</span>
+                </div>
+            </div>
+
+            <div style="position: fixed; bottom: calc(var(--bottom-nav-h) + 16px); left: 16px; right: 16px; z-index: 90;">
+                <button class="btn-primary" onclick="window.location.href='/checkout.html'">
+                    إتمام الشراء <span>💳</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="/" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span>الرئيسية</span>
+        </a>
+        <a href="/cart.html" class="nav-item active">
+            <span class="nav-icon">🛒</span>
+            <span>السلة</span>
+            <span class="nav-badge cart-badge">0</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/cart.js"></script>
+</body>
+</html>
