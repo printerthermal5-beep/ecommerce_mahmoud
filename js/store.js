@@ -179,7 +179,7 @@ function renderProducts() {
             </a>
             
             <div class="product-info">
-                <a href="./product.html?id=${product.id}" onclick="saveClickedProduct('${product.id}')" class="product-name" style="text-decoration:none; color:inherit;">${product.name}</a>`     <a href="./product.html?id=${product.id}" class="product-name" style="text-decoration:none; color:inherit;">${product.name}</a>
+                <a href="./product.html?id=${product.id}" onclick="saveClickedProduct('${product.id}')" class="product-name" style="text-decoration:none; color:inherit;">${product.name}</a>
                 <div class="product-price-row">
                     <span class="product-price">${formatPrice(displayPrice)}</span>
                     ${hasDiscount ? `<span class="product-original-price">${formatPrice(product.price)}</span>` : ''}
