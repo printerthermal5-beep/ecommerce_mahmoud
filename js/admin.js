@@ -164,9 +164,15 @@ async function editProduct(id) {
     const urlInput = document.getElementById('prod-image-url-input');
     if (urlInput) urlInput.value = '';
 
-    // Handle existing images
+    // Handle existing images flexible parsing
     if (Array.isArray(prod.images) && prod.images.length > 0) {
         currentProductExistingImages = [...prod.images];
+    } else if (typeof prod.images === 'string') {
+        try {
+            currentProductExistingImages = JSON.parse(prod.images);
+        } catch(e) {
+            currentProductExistingImages = prod.image_url ? [prod.image_url] : [];
+        }
     } else if (prod.image_url) {
         currentProductExistingImages = [prod.image_url];
     } else {
@@ -294,7 +300,7 @@ async function handleProductSubmit(e) {
         }
 
         // Fallback: If DB schema doesn't have 'images' column yet, retry without 'images' field
-        if (dbError && dbError.message && dbError.message.includes('images')) {
+        if (dbError && (dbError.message?.includes('images') || dbError.code === 'PGRST204')) {
             console.warn('Retrying product save without images JSON column fallback...', dbError);
             delete productData.images;
             if (id) {
@@ -303,6 +309,9 @@ async function handleProductSubmit(e) {
             } else {
                 const retryRes = await db.from('products').insert([productData]);
                 dbError = retryRes.error;
+            }
+            if (!dbError) {
+                showToast('تم حفظ الصورة الرئيسية. يرجى تنفيذ كود SQL المكتوب لتفعيل الصور المتعددة', 'warning', 6000);
             }
         }
 
