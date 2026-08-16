@@ -18,7 +18,7 @@ function renderCart() {
                 <div class="empty-state-icon">🛒</div>
                 <h3>السلة فارغة</h3>
                 <p>لم تقم بإضافة أي منتجات للسلة بعد</p>
-                <a href="/" class="btn-secondary" style="margin-top: 16px;">
+                <a href="./index.html" class="btn-secondary" style="margin-top: 16px;">
                     تصفح المنتجات
                 </a>
             </div>

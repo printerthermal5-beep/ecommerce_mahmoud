@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check Auth
     const { data: { session } } = await db.auth.getSession();
     if (!session) {
-        window.location.href = '/admin/login.html';
+        window.location.href = './login.html';
         return;
     }
 
@@ -104,25 +104,33 @@ async function loadCategoriesForSelect() {
     }
 }
 
+let currentProductExistingImages = [];
+
 async function loadAdminProducts() {
     const tbody = document.getElementById('products-tbody');
     const { data } = await db.from('products').select('*, categories(name)').order('created_at', { ascending: false });
     
-    if(!data) return;
+    if (!data) return;
 
     tbody.innerHTML = data.map(prod => `
         <tr>
             <td>
                 <div style="display:flex; align-items:center; gap:12px;">
                     ${prod.image_url ? `<img src="${prod.image_url}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;">` : '🏺'}
-                    ${prod.name}
+                    <div>
+                        <div style="font-weight:600;">${prod.name}</div>
+                        ${prod.images && prod.images.length > 1 ? `<small style="color:var(--gold-light);">${prod.images.length} صور 📸</small>` : ''}
+                    </div>
                 </div>
             </td>
             <td style="font-family:var(--font-en);">${formatPrice(prod.price)}</td>
             <td>${prod.categories?.name || '-'}</td>
             <td>${prod.is_available ? '✅' : '❌'}</td>
             <td>
-                <button class="btn-secondary" style="padding: 4px 8px;" onclick="deleteProduct('${prod.id}')">حذف</button>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn-secondary" style="padding: 4px 10px; font-size:0.8rem;" onclick="editProduct('${prod.id}')">✏️ تعديل</button>
+                    <button class="btn-secondary" style="padding: 4px 10px; font-size:0.8rem; color:var(--error); border-color:rgba(255,82,82,0.3);" onclick="deleteProduct('${prod.id}')">🗑️ حذف</button>
+                </div>
             </td>
         </tr>
     `).join('');
@@ -131,8 +139,64 @@ async function loadAdminProducts() {
 function openProductModal() {
     document.getElementById('product-form').reset();
     document.getElementById('prod-id').value = '';
-    document.getElementById('modal-title').textContent = 'إضافة منتج';
+    currentProductExistingImages = [];
+    renderExistingImages();
+    document.getElementById('modal-title').textContent = 'إضافة منتج جديد';
     document.getElementById('product-modal').classList.add('show');
+}
+
+async function editProduct(id) {
+    const { data: prod, error } = await db.from('products').select('*').eq('id', id).single();
+    if (error || !prod) {
+        showToast('تعذر جلب بيانات المنتج', 'error');
+        return;
+    }
+
+    document.getElementById('product-form').reset();
+    document.getElementById('prod-id').value = prod.id;
+    document.getElementById('prod-name').value = prod.name || '';
+    document.getElementById('prod-price').value = prod.price || '';
+    document.getElementById('prod-discount-price').value = prod.discount_price || '';
+    document.getElementById('prod-category').value = prod.category_id || '';
+    document.getElementById('prod-desc').value = prod.description || '';
+
+    // Handle existing images
+    if (Array.isArray(prod.images) && prod.images.length > 0) {
+        currentProductExistingImages = [...prod.images];
+    } else if (prod.image_url) {
+        currentProductExistingImages = [prod.image_url];
+    } else {
+        currentProductExistingImages = [];
+    }
+
+    renderExistingImages();
+    document.getElementById('modal-title').textContent = 'تعديل المنتج';
+    document.getElementById('product-modal').classList.add('show');
+}
+
+function renderExistingImages() {
+    const group = document.getElementById('existing-images-group');
+    const container = document.getElementById('existing-images-container');
+    if (!container || !group) return;
+
+    if (currentProductExistingImages.length === 0) {
+        group.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    group.style.display = 'block';
+    container.innerHTML = currentProductExistingImages.map((url, idx) => `
+        <div style="position:relative; width:65px; height:65px; border-radius:6px; overflow:hidden; border:1px solid var(--border);">
+            <img src="${url}" style="width:100%; height:100%; object-fit:cover;">
+            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(255,82,82,0.9); color:#fff; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.65rem;" onclick="removeExistingImage(${idx})" title="حذف هذه الصورة">✕</button>
+        </div>
+    `).join('');
+}
+
+function removeExistingImage(idx) {
+    currentProductExistingImages.splice(idx, 1);
+    renderExistingImages();
 }
 
 function closeModal(modalId) {
@@ -149,44 +213,55 @@ async function handleProductSubmit(e) {
     const id = document.getElementById('prod-id').value;
     const fileInput = document.getElementById('prod-image-file');
     
-    let imageUrl = null;
+    let newlyUploadedUrls = [];
 
     try {
-        // 1. Upload Image if a new file is selected
+        // Upload multiple selected files if any
         if (fileInput.files && fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-            const filePath = `products/${fileName}`;
-
-            btn.innerHTML = 'جاري رفع الصورة... ⏳';
-            const { error: uploadError } = await db.storage
-                .from('products')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            // Get public URL
-            const { data: { publicUrl } } = db.storage
-                .from('products')
-                .getPublicUrl(filePath);
+            btn.innerHTML = `جاري رفع ${fileInput.files.length} صور... ⏳`;
             
-            imageUrl = publicUrl;
+            for (let i = 0; i < fileInput.files.length; i++) {
+                const file = fileInput.files[i];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+                const filePath = `products/${fileName}`;
+
+                const { error: uploadError } = await db.storage
+                    .from('products')
+                    .upload(filePath, file);
+
+                if (uploadError) {
+                    console.error('Error uploading file:', uploadError);
+                    continue; // Skip failed file
+                }
+
+                const { data: { publicUrl } } = db.storage
+                    .from('products')
+                    .getPublicUrl(filePath);
+
+                if (publicUrl) {
+                    newlyUploadedUrls.push(publicUrl);
+                }
+            }
         }
+
+        // Combine kept existing images + newly uploaded images
+        const allFinalImages = [...currentProductExistingImages, ...newlyUploadedUrls];
+        const primaryImageUrl = allFinalImages.length > 0 ? allFinalImages[0] : null;
 
         const catValue = document.getElementById('prod-category').value;
+        const discountVal = document.getElementById('prod-discount-price').value;
+
         const productData = {
-            name: document.getElementById('prod-name').value,
-            price: document.getElementById('prod-price').value,
+            name: document.getElementById('prod-name').value.trim(),
+            price: Number(document.getElementById('prod-price').value),
+            discount_price: discountVal ? Number(discountVal) : null,
             category_id: catValue ? catValue : null,
-            description: document.getElementById('prod-desc').value,
+            description: document.getElementById('prod-desc').value.trim(),
+            image_url: primaryImageUrl,
+            images: allFinalImages,
             is_available: true
         };
-
-        // Only update image_url if a new one was uploaded
-        if (imageUrl) {
-            productData.image_url = imageUrl;
-        }
 
         let error;
         if (id) {
@@ -199,26 +274,58 @@ async function handleProductSubmit(e) {
 
         if (error) throw error;
 
-        showToast('تم الحفظ بنجاح');
+        showToast(id ? 'تم تعديل المنتج بنجاح 🎉' : 'تم إضافة المنتج بنجاح 🎉');
         closeModal('product-modal');
         loadAdminProducts();
         loadDashboardStats();
     } catch (err) {
         console.error('Error saving product:', err);
-        showToast('حدث خطأ أثناء الحفظ', 'error');
+        showToast(err.message || 'حدث خطأ أثناء الحفظ', 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;
     }
 }
 
+// Export Orders to CSV/Excel
+async function exportOrdersToCSV() {
+    showToast('جاري تجهيز ملف المبيعات... ⏳');
+    const { data: orders, error } = await db.from('orders').select('*').order('created_at', { ascending: false });
+    
+    if (error || !orders || orders.length === 0) {
+        showToast('لا توجد طلبات لتصديرها', 'error');
+        return;
+    }
+
+    let csvContent = '\uFEFF'; // UTF-8 BOM for Excel Arabic support
+    csvContent += 'رقم الطلب,الاسم,الهاتف,العنوان,الملاحظات,الإجمالي (ج.م),الحالة,التاريخ\n';
+
+    orders.forEach(o => {
+        const date = new Date(o.created_at).toLocaleDateString('ar-EG');
+        const status = o.status === 'confirmed' ? 'مؤكد' : o.status === 'pending' ? 'قيد المراجعة' : o.status;
+        csvContent += `"${o.order_number}","${o.customer_name}","${o.customer_phone}","${(o.customer_address || '').replace(/"/g, '""')}","${(o.customer_notes || '').replace(/"/g, '""')}","${o.total_amount}","${status}","${date}"\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `طلبات_متجر_النور_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('تم تحميل الملف بنجاح! 📊');
+}
+
 async function deleteProduct(id) {
-    if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+    if (confirm('هل أنت متأكد من حذف هذا المنتج نهائياً؟')) {
         const { error } = await db.from('products').delete().eq('id', id);
-        if(!error) {
-            showToast('تم الحذف');
+        if (!error) {
+            showToast('تم حذف المنتج بنجاح');
             loadAdminProducts();
             loadDashboardStats();
+        } else {
+            showToast('حدث خطأ أثناء الحذف', 'error');
         }
     }
 }
@@ -308,5 +415,5 @@ async function deleteCategory(id) {
 // --- Auth ---
 async function logout() {
     await db.auth.signOut();
-    window.location.href = '/admin/login.html';
+    window.location.href = './login.html';
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المفضلة - متجر النور</title>
+    <meta name="theme-color" content="#0A0A0F">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="back-header" style="padding:0; margin:0;">
+            <a href="./index.html" class="back-btn">➔</a>
+            <h1 class="header-title">المفضلة ❤️</h1>
+        </div>
+        <div class="header-actions">
+            <a href="./cart.html" class="header-btn" title="السلة">
+                🛒
+                <span class="cart-badge">0</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-content" style="padding-top: calc(var(--header-h) + 16px);">
+        <section class="products-section">
+            <div id="wishlist-grid" class="products-grid">
+                <!-- Wishlist items rendered via wishlist.js -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="store-footer"></footer>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="./index.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span>الرئيسية</span>
+        </a>
+        <a href="./wishlist.html" class="nav-item active">
+            <span class="nav-icon">❤️</span>
+            <span>المفضلة</span>
+            <span class="wishlist-badge nav-badge">0</span>
+        </a>
+        <a href="./cart.html" class="nav-item">
+            <span class="nav-icon">🛒</span>
+            <span>السلة</span>
+            <span class="cart-badge nav-badge">0</span>
+        </a>
+        <a href="./orders.html" class="nav-item">
+            <span class="nav-icon">📦</span>
+            <span>طلباتي</span>
+        </a>
+    </nav>
+
+    <script src="js/wishlist.js"></script>
+</body>
+</html>

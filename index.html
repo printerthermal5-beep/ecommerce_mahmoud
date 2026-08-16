@@ -10,6 +10,13 @@
     <meta name="theme-color" content="#0A0A0F">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Open Graph Social Sharing -->
+    <meta property="og:title" content="متجر النور للأنتيكات والتحف">
+    <meta property="og:description" content="تشكيلة حصرية وفخمة من التحف والفازات والكماليات المنزلية النادرة.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="متجر النور">
+
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
     
@@ -20,6 +27,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <!-- Floating WhatsApp Support Button -->
+    <a href="https://wa.me/2001222462607?text=مرحباً%20متجر%20النور،%20أريد%20الاستفسار%20عن%20منتجاتكم" target="_blank" rel="noopener" class="floating-whatsapp-btn" title="تحدث معنا على واتساب" onclick="triggerHaptic()">
+        💬
+    </a>
     <!-- Announcement Bar -->
     <div class="announcement-bar">
         <span>✨ أهلاً بكم في متجر النور - وجهتكم الأولى لأفخم الأنتيكات والكماليات ✨</span>
@@ -29,7 +40,11 @@
     <header class="header">
         <h1 class="header-title">النور للأنتيكات</h1>
         <div class="header-actions">
-            <a href="./cart.html" class="header-btn">
+            <a href="./wishlist.html" class="header-btn" title="المفضلة">
+                ❤️
+                <span class="wishlist-badge cart-badge" style="background:var(--error); color:#fff;">0</span>
+            </a>
+            <a href="./cart.html" class="header-btn" title="السلة">
                 🛒
                 <span class="cart-badge">0</span>
             </a>
@@ -44,11 +59,17 @@
             <p>اكتشف تشكيلتنا الحصرية من التحف والفازات النادرة</p>
         </div>
 
-        <!-- Search -->
+        <!-- Search & Sorting -->
         <div class="search-container animate-in" style="animation-delay: 0.1s;">
             <div class="search-bar">
                 <span class="search-icon">🔍</span>
                 <input type="text" id="search-input" placeholder="ابحث عن تحف، فازات، كماليات...">
+                <select id="sort-select" style="background:transparent; border:none; color:var(--gold-light); font-size:0.8rem; outline:none; cursor:pointer; padding:0 8px;" onchange="handleSortChange(this.value)">
+                    <option value="default" style="background:var(--bg-card); color:var(--text-primary);">الأحدث 🆕</option>
+                    <option value="sale" style="background:var(--bg-card); color:var(--text-primary);">العروض فقط 🔥</option>
+                    <option value="price-low" style="background:var(--bg-card); color:var(--text-primary);">السعر: من الأقل للأعلى ⬆️</option>
+                    <option value="price-high" style="background:var(--bg-card); color:var(--text-primary);">السعر: من الأعلى للأقل ⬇️</option>
+                </select>
             </div>
         </div>
 
@@ -70,6 +91,9 @@
                 <!-- Products loaded dynamically -->
             </div>
         </section>
+
+        <!-- Footer -->
+        <footer class="store-footer"></footer>
     </main>
 
     <!-- PWA Install Banner -->
@@ -89,10 +113,19 @@
             <span class="nav-icon">🏠</span>
             <span>الرئيسية</span>
         </a>
+        <a href="./wishlist.html" class="nav-item">
+            <span class="nav-icon">❤️</span>
+            <span>المفضلة</span>
+            <span class="wishlist-badge nav-badge" style="background:var(--error); color:#fff;">0</span>
+        </a>
         <a href="./cart.html" class="nav-item">
             <span class="nav-icon">🛒</span>
             <span>السلة</span>
             <span class="nav-badge cart-badge">0</span>
+        </a>
+        <a href="./orders.html" class="nav-item">
+            <span class="nav-icon">📦</span>
+            <span>طلباتي</span>
         </a>
     </nav>
 

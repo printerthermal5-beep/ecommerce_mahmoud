@@ -2,19 +2,24 @@
 // Service Worker - متجر النور
 // =============================================
 
-const CACHE_NAME = 'alnour-store-v1';
+const CACHE_NAME = 'alnour-store-v2';
 const STATIC_ASSETS = [
     './',
     './index.html',
+    './product.html',
     './cart.html',
+    './wishlist.html',
+    './orders.html',
     './checkout.html',
     './css/style.css',
     './js/config.js',
     './js/store.js',
+    './js/product.js',
     './js/cart.js',
+    './js/wishlist.js',
+    './js/orders.js',
     './js/checkout.js',
-    './manifest.json',
-    'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@400;500;600;700&display=swap'
+    './manifest.json'
 ];
 
 // Install - Cache static assets

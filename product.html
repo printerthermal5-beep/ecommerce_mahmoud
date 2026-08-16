@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تفاصيل المنتج | متجر النور</title>
     <meta name="theme-color" content="#0A0A0F">
+    
+    <!-- Open Graph Social Sharing -->
+    <meta property="og:title" content="تفاصيل التحفة - متجر النور">
+    <meta property="og:description" content="اكتشف تفاصيل وشراء أفخم تحفة وأنتيكة متميزة من متجر النور.">
+    <meta property="og:type" content="product">
+    <meta property="og:site_name" content="متجر النور">
+
     <link rel="stylesheet" href="./css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -53,6 +60,10 @@
     </style>
 </head>
 <body>
+    <!-- Floating WhatsApp Support Button -->
+    <a href="https://wa.me/2001222462607?text=مرحباً%20متجر%20النور،%20أريد%20الاستفسار%20عن%20هذا%20المنتج" target="_blank" rel="noopener" class="floating-whatsapp-btn" title="تحدث معنا على واتساب" onclick="triggerHaptic()">
+        💬
+    </a>
     <!-- Header -->
     <header class="header">
         <div class="back-header" style="margin: 0; padding: 0;">
@@ -60,21 +71,29 @@
             <h1 class="page-title">تفاصيل المنتج</h1>
         </div>
         <div class="header-actions">
-            <a href="./cart.html" class="header-btn">
+            <a href="./wishlist.html" class="header-btn" title="المفضلة">
+                ❤️<span class="wishlist-badge cart-badge" style="background:var(--error); color:#fff;">0</span>
+            </a>
+            <a href="./cart.html" class="header-btn" title="السلة">
                 🛒<span class="cart-badge">0</span>
             </a>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="page-content product-details-page" id="product-container">
-        <div style="padding: 40px; text-align: center;">
-            <div class="skeleton skeleton-image" style="height: 350px; border-radius: 0;"></div>
-            <div style="padding: 20px;">
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
+    <main class="page-content product-details-page">
+        <div id="product-container">
+            <div style="padding: 40px; text-align: center;">
+                <div class="skeleton skeleton-image" style="height: 350px; border-radius: 0;"></div>
+                <div style="padding: 20px;">
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text"></div>
+                </div>
             </div>
         </div>
+
+        <!-- Footer -->
+        <footer class="store-footer"></footer>
     </main>
 
     <!-- Bottom Navigation -->
@@ -83,10 +102,19 @@
             <span class="nav-icon">🏠</span>
             <span>الرئيسية</span>
         </a>
+        <a href="./wishlist.html" class="nav-item">
+            <span class="nav-icon">❤️</span>
+            <span>المفضلة</span>
+            <span class="wishlist-badge nav-badge" style="background:var(--error); color:#fff;">0</span>
+        </a>
         <a href="./cart.html" class="nav-item">
             <span class="nav-icon">🛒</span>
             <span>السلة</span>
             <span class="nav-badge cart-badge">0</span>
+        </a>
+        <a href="./orders.html" class="nav-item">
+            <span class="nav-icon">📦</span>
+            <span>طلباتي</span>
         </a>
     </nav>
 

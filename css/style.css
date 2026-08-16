@@ -489,3 +489,215 @@ ul, ol { list-style: none; }
 @media (min-width: 640px) {
     .products-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
+
+/* =============================================
+   NEW UX FEATURES STYLES
+   ============================================= */
+
+/* --- Floating Bottom Cart Bar --- */
+.floating-cart-bar {
+    position: fixed; bottom: calc(var(--bottom-nav-h) + 10px);
+    left: 16px; right: 16px; z-index: 95;
+    background: linear-gradient(135deg, rgba(28,28,40,0.95), rgba(22,22,31,0.95));
+    border: 1px solid var(--gold); border-radius: var(--radius-xl);
+    padding: 10px 16px; display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 24px rgba(200, 164, 92, 0.25);
+    animation: fadeInUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.floating-cart-info { display: flex; align-items: center; gap: 10px; }
+.floating-cart-icon { font-size: 1.5rem; }
+.floating-cart-text { display: flex; flex-direction: column; }
+.floating-cart-count { font-size: 0.75rem; color: var(--text-secondary); }
+.floating-cart-total { font-family: var(--font-en); font-size: 0.95rem; font-weight: 700; color: var(--gold-light); }
+.floating-cart-btn {
+    padding: 8px 18px; border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: var(--bg-primary); font-weight: 700; font-size: 0.82rem;
+    box-shadow: var(--shadow-sm); transition: var(--transition);
+}
+.floating-cart-btn:hover { background: linear-gradient(135deg, var(--gold-light), var(--gold)); }
+
+/* --- Wishlist Button on Product Cards --- */
+.wishlist-card-btn {
+    position: absolute; top: 8px; right: 8px; z-index: 10;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(10, 10, 15, 0.65); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem; cursor: pointer; transition: var(--transition);
+}
+.wishlist-card-btn.active {
+    background: rgba(255, 82, 82, 0.2); border-color: var(--error);
+}
+
+/* --- Quick View Button on Cards --- */
+.quick-view-card-btn {
+    position: absolute; bottom: 80px; right: 8px; z-index: 10;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(10, 10, 15, 0.65); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; color: var(--text-primary); cursor: pointer;
+    transition: var(--transition); opacity: 0.9;
+}
+.quick-view-card-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* --- Direct Card Quantity Controls --- */
+.card-qty-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 4px; border-radius: var(--radius-md);
+    background: var(--bg-elevated); border: 1px solid var(--gold);
+}
+.card-qty-btn {
+    width: 28px; height: 28px; border-radius: var(--radius-sm);
+    background: var(--gold); color: var(--bg-primary);
+    font-weight: 700; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: var(--transition);
+}
+.card-qty-btn.minus { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
+.card-qty-val { font-family: var(--font-en); font-weight: 700; font-size: 0.9rem; color: var(--gold-light); }
+
+/* --- Quick View & Lightbox Modal Base --- */
+.modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+.bottom-sheet {
+    width: 100%; max-width: 550px; background: var(--bg-card);
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+    transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-height: 85vh; overflow-y: auto; position: relative;
+}
+.modal-overlay.show .bottom-sheet { transform: translateY(0); }
+
+.modal-close-btn {
+    position: absolute; top: 16px; left: 16px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: pointer; transition: var(--transition);
+}
+.modal-close-btn:hover { color: var(--text-primary); border-color: var(--gold); }
+
+/* --- Lightbox Fullscreen Zoom --- */
+.lightbox-content {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; width: 100%; position: relative; padding: 20px;
+}
+.lightbox-img {
+    max-width: 95%; max-height: 80vh; object-fit: contain;
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    transition: transform 0.3s ease; cursor: zoom-in;
+}
+.lightbox-img.zoomed { transform: scale(1.8); cursor: zoom-out; }
+
+/* --- Orders & Wishlist Cards --- */
+.order-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px;
+}
+.order-card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 10px;
+}
+.order-number { font-family: var(--font-en); font-weight: 700; color: var(--gold-light); }
+.status-badge {
+    padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.72rem; font-weight: 700;
+}
+.status-pending { background: rgba(255,193,7,0.15); color: var(--warning); border: 1px solid var(--warning); }
+.status-confirmed { background: rgba(76,175,80,0.15); color: var(--success); border: 1px solid var(--success); }
+
+/* --- Related Products horizontal scroll --- */
+.related-products-scroll {
+    display: flex; gap: 12px; overflow-x: auto; padding: 10px 16px;
+    scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none;
+}
+.related-products-scroll::-webkit-scrollbar { display: none; }
+.related-product-card {
+    min-width: 140px; width: 140px; flex-shrink: 0; scroll-snap-align: start;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 8px; text-align: center;
+}
+.related-product-card img { width: 100%; height: 100px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom: 6px; }
+.related-product-name { font-size: 0.75rem; font-weight: 600; line-clamp: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.related-product-price { font-family: var(--font-en); font-size: 0.8rem; color: var(--gold-light); font-weight: 700; }
+
+/* =============================================
+   STORE FOOTER STYLES
+   ============================================= */
+.store-footer {
+    background: var(--bg-secondary); border-top: 1px solid var(--border);
+    padding: 30px 20px calc(var(--bottom-nav-h) + 30px) 20px;
+    text-align: center; margin-top: 40px; position: relative;
+}
+.footer-logo {
+    font-size: 1.2rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 8px;
+}
+.footer-desc {
+    font-size: 0.82rem; color: var(--text-secondary); max-width: 320px;
+    margin: 0 auto 20px auto; line-height: 1.6;
+}
+.footer-socials {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; margin-bottom: 24px;
+}
+.social-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: var(--radius-full);
+    font-size: 0.85rem; font-weight: 700; text-decoration: none;
+    transition: var(--transition); box-shadow: var(--shadow-sm);
+}
+.social-btn.whatsapp {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #ffffff;
+}
+.social-btn.whatsapp:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); }
+
+.social-btn.facebook {
+    background: linear-gradient(135deg, #1877F2, #0d52ab);
+    color: #ffffff;
+}
+.social-btn.facebook:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(24, 119, 242, 0.4); }
+
+.social-icon { font-size: 1.2rem; }
+
+.footer-copy {
+    font-size: 0.75rem; color: var(--text-muted);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 16px; margin-top: 16px;
+}
+
+/* =============================================
+   FLOATING WHATSAPP BUTTON
+   ============================================= */
+.floating-whatsapp-btn {
+    position: fixed; bottom: calc(var(--bottom-nav-h) + 20px); left: 16px; z-index: 95;
+    width: 50px; height: 50px; border-radius: 50%;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #ffffff; display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; text-decoration: none;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    transition: var(--transition); animation: whatsappPulse 2s infinite;
+}
+.floating-whatsapp-btn:hover {
+    transform: scale(1.1); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+}
+@keyframes whatsappPulse {
+    0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+    70% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+
+

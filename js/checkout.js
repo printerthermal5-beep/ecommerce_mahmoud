@@ -7,8 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Redirect if cart is empty
     if (cart.length === 0) {
-        window.location.href = '/cart.html';
+        window.location.href = './cart.html';
         return;
+    }
+
+    // Auto-fill Customer Info if exists
+    const savedCustomer = CustomerManager.getInfo();
+    if (savedCustomer) {
+        if (savedCustomer.name) document.getElementById('cust-name').value = savedCustomer.name;
+        if (savedCustomer.phone) document.getElementById('cust-phone').value = savedCustomer.phone;
+        if (savedCustomer.address) document.getElementById('cust-address').value = savedCustomer.address;
     }
 
     renderOrderSummary(cart);
@@ -78,10 +86,21 @@ async function handleCheckoutSubmit(e) {
     const cart = CartManager.getCart();
     const totalAmount = CartManager.getTotal();
     
+    const customerName = document.getElementById('cust-name').value.trim();
+    const customerPhone = document.getElementById('cust-phone').value.trim();
+    const customerAddress = document.getElementById('cust-address').value.trim();
+
+    // Auto-save Customer info
+    CustomerManager.saveInfo({
+        name: customerName,
+        phone: customerPhone,
+        address: customerAddress
+    });
+
     const customerData = {
-        customer_name: document.getElementById('cust-name').value.trim(),
-        customer_phone: document.getElementById('cust-phone').value.trim(),
-        customer_address: document.getElementById('cust-address').value.trim(),
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_address: customerAddress,
         customer_notes: document.getElementById('cust-notes').value.trim(),
         total_amount: totalAmount
     };
@@ -111,6 +130,16 @@ async function handleCheckoutSubmit(e) {
             .insert(orderItems);
 
         if (itemsError) throw itemsError;
+
+        // Save order locally for "My Orders" history page
+        OrderStorageManager.saveOrder({
+            id: orderData.id,
+            order_number: orderData.order_number,
+            date: new Date().toISOString(),
+            total_amount: totalAmount,
+            status: 'pending',
+            items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price }))
+        });
 
         // 3. Success -> WhatsApp
         showSuccessState(orderData.order_number, customerData, cart, totalAmount);

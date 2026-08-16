@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS products (
     price NUMERIC NOT NULL DEFAULT 0,
     discount_price NUMERIC,
     image_url TEXT,
+    images JSONB DEFAULT '[]'::jsonb,
     is_available BOOLEAN DEFAULT true,
     sort_order INT DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT now()

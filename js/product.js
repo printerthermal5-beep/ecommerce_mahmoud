@@ -34,6 +34,7 @@ async function loadProductDetails(id) {
     
     currentProduct = data;
     renderProductDetails();
+    await loadRelatedProducts(data.category_id, data.id);
 }
 
 function renderProductDetails() {
@@ -45,21 +46,52 @@ function renderProductDetails() {
     const displayPrice = hasDiscount ? p.discount_price : p.price;
     const categoryName = p.categories ? p.categories.name : 'منتجات عامة';
     const categoryIcon = p.categories && p.categories.icon ? p.categories.icon : '✨';
-    
+    const isWishlisted = WishlistManager.isWishlisted(p.id);
+
     let html = '';
     
-    // Image
-    if (p.image_url) {
-        html += `<img src="${p.image_url}" alt="${p.name}" class="product-hero-image animate-in">`;
+    let imagesList = [];
+    if (Array.isArray(p.images) && p.images.length > 0) {
+        imagesList = p.images;
+    } else if (p.image_url) {
+        imagesList = [p.image_url];
+    }
+
+    let html = '';
+    
+    // Hero Image & Gallery
+    if (imagesList.length > 0) {
+        const primaryImage = imagesList[0];
+        html += `
+            <div style="position:relative;">
+                <img id="main-product-img" src="${primaryImage}" alt="${p.name}" class="product-hero-image animate-in" onclick="openLightbox(this.src)" title="انقر لتكبير الصورة 🔍">
+                <span style="position:absolute; bottom:12px; left:12px; background:rgba(0,0,0,0.6); padding:4px 10px; border-radius:var(--radius-full); font-size:0.75rem; color:#fff; backdrop-filter:blur(4px);">🔍 انقر للتكبير</span>
+            </div>
+        `;
+
+        if (imagesList.length > 1) {
+            html += `
+                <div class="product-gallery-thumbnails animate-in" style="display:flex; gap:10px; overflow-x:auto; padding:12px 16px; background:var(--bg-secondary); border-bottom:1px solid var(--border);">
+                    ${imagesList.map((imgUrl, idx) => `
+                        <img src="${imgUrl}" class="gallery-thumb ${idx === 0 ? 'active' : ''}" style="width:65px; height:65px; object-fit:cover; border-radius:var(--radius-md); border:2px solid ${idx === 0 ? 'var(--gold)' : 'transparent'}; cursor:pointer; flex-shrink:0; transition:var(--transition);" onclick="changeMainImage('${imgUrl}', this)">
+                    `).join('')}
+                </div>
+            `;
+        }
     } else {
         html += `<div class="product-hero-placeholder animate-in">🏺</div>`;
     }
     
-    // Meta (Title, Category, Price)
+    // Meta (Title, Category, Price, Wishlist)
     html += `
         <div class="product-meta-container animate-in" style="animation-delay: 0.1s;">
-            <div class="category-badge">
-                <span>${categoryIcon}</span> ${categoryName}
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="category-badge">
+                    <span>${categoryIcon}</span> ${categoryName}
+                </div>
+                <button class="wishlist-card-btn ${isWishlisted ? 'active' : ''}" style="position:static;" onclick="toggleDetailsWishlist('${p.id}', this)">
+                    ${isWishlisted ? '❤️' : '🤍'}
+                </button>
             </div>
             <h1 class="product-title">${p.name}</h1>
             <div style="display:flex; align-items:center; margin-top: 8px;">
@@ -73,14 +105,24 @@ function renderProductDetails() {
     html += `
         <div class="description-box animate-in" style="animation-delay: 0.2s;">
             <h3><span>📝</span> وصف المنتج</h3>
-            <p>${p.description ? p.description : 'لا يوجد وصف متاح لهذا المنتج حالياً.'}</p>
+            <p>${p.description ? p.description : 'تحفة عريقة ومصنوعة بإتقان لتكون قطعة ديكور مبهرة تتناسب مع كافة الأذواق.'}</p>
         </div>
+    `;
+
+    // Related Products placeholder
+    html += `
+        <section class="animate-in" style="animation-delay: 0.25s; margin-top: 20px;">
+            <h3 class="section-title">تحف قد تعجبك أيضاً</h3>
+            <div id="related-products-container" class="related-products-scroll">
+                <div style="padding: 10px; color: var(--text-muted); font-size:0.8rem;">جاري تحميل اقتراحات ذات صلة...</div>
+            </div>
+        </section>
     `;
     
     // Fixed Bottom Action Bar
     html += `
         <div class="fixed-bottom-bar animate-in" style="animation-delay: 0.3s;">
-            <button class="share-btn" onclick="shareProduct()">
+            <button class="share-btn" onclick="shareProduct()" title="مشاركة الرابط">
                 🔗
             </button>
             <button class="btn-primary" onclick="addCurrentToCart(this)" ${!p.is_available ? 'disabled' : ''}>
@@ -90,6 +132,84 @@ function renderProductDetails() {
     `;
     
     container.innerHTML = html;
+}
+
+// --- Load Related Products ---
+async function loadRelatedProducts(categoryId, currentId) {
+    const container = document.getElementById('related-products-container');
+    if (!container) return;
+
+    let query = db.from('products').select('*').eq('is_available', true).neq('id', currentId);
+    if (categoryId) {
+        query = query.eq('category_id', categoryId);
+    }
+
+    const { data } = await query.limit(6);
+    
+    if (!data || data.length === 0) {
+        container.innerHTML = '<div style="padding:10px; color:var(--text-muted); font-size:0.8rem;">لا توجد منتجات أخرى من نفس القسم حالياً.</div>';
+        return;
+    }
+
+    container.innerHTML = data.map(prod => `
+        <a href="./product.html?id=${prod.id}" class="related-product-card">
+            ${prod.image_url ? `<img src="${prod.image_url}" alt="${prod.name}">` : '<div style="height:100px; background:var(--bg-secondary); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:2rem;">🏺</div>'}
+            <div class="related-product-name">${prod.name}</div>
+            <div class="related-product-price">${formatPrice(prod.discount_price || prod.price)}</div>
+        </a>
+    `).join('');
+}
+
+function changeMainImage(imgUrl, thumbEl) {
+    const mainImg = document.getElementById('main-product-img');
+    if (mainImg) {
+        mainImg.src = imgUrl;
+    }
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.style.borderColor = 'transparent');
+    if (thumbEl) {
+        thumbEl.style.borderColor = 'var(--gold)';
+    }
+    triggerHaptic();
+}
+
+// --- Wishlist Toggle ---
+function toggleDetailsWishlist(productId, btn) {
+    if (!currentProduct) return;
+    const isWishlisted = WishlistManager.toggle(currentProduct);
+    btn.innerHTML = isWishlisted ? '❤️' : '🤍';
+    btn.classList.toggle('active', isWishlisted);
+}
+
+// --- Image Lightbox / Zoom ---
+function openLightbox(imageUrl) {
+    triggerHaptic();
+    let modal = document.getElementById('lightbox-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'lightbox-modal';
+        modal.className = 'modal-overlay';
+        modal.style.alignItems = 'center';
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+        <button class="modal-close-btn" style="top:20px; right:20px; left:auto;" onclick="closeLightbox()">✕</button>
+        <div class="lightbox-content">
+            <img src="${imageUrl}" class="lightbox-img" id="lightbox-img-el" onclick="this.classList.toggle('zoomed')">
+            <p style="color:var(--text-secondary); font-size:0.78rem; margin-top:12px;">انقر للتكبير / التصغير 🔍</p>
+        </div>
+    `;
+
+    modal.onclick = (e) => {
+        if (e.target === modal) closeLightbox();
+    };
+
+    setTimeout(() => modal.classList.add('show'), 10);
+}
+
+function closeLightbox() {
+    const modal = document.getElementById('lightbox-modal');
+    if (modal) modal.classList.remove('show');
 }
 
 function addCurrentToCart(btnElement) {
@@ -150,3 +270,4 @@ function showError(msg) {
         `;
     }
 }
+

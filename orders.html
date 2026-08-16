@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>طلباتي - متجر النور</title>
+    <meta name="theme-color" content="#0A0A0F">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="back-header" style="padding:0; margin:0;">
+            <a href="./index.html" class="back-btn">➔</a>
+            <h1 class="header-title">سجل طلباتي 📦</h1>
+        </div>
+        <div class="header-actions">
+            <a href="./cart.html" class="header-btn" title="السلة">
+                🛒
+                <span class="cart-badge">0</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-content" style="padding: calc(var(--header-h) + 16px) 16px 20px 16px;">
+        <div id="orders-list-container">
+            <!-- Orders rendered via orders.js -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="store-footer"></footer>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="./index.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span>الرئيسية</span>
+        </a>
+        <a href="./wishlist.html" class="nav-item">
+            <span class="nav-icon">❤️</span>
+            <span>المفضلة</span>
+            <span class="wishlist-badge nav-badge">0</span>
+        </a>
+        <a href="./cart.html" class="nav-item">
+            <span class="nav-icon">🛒</span>
+            <span>السلة</span>
+            <span class="cart-badge nav-badge">0</span>
+        </a>
+        <a href="./orders.html" class="nav-item active">
+            <span class="nav-icon">📦</span>
+            <span>طلباتي</span>
+        </a>
+    </nav>
+
+    <script src="js/orders.js"></script>
+</body>
+</html>
