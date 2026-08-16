@@ -699,5 +699,42 @@ ul, ol { list-style: none; }
     100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
 }
 
+/* =============================================
+   MODAL OVERLAY & LIGHTBOX
+   ============================================= */
+.modal-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease;
+    padding: 20px;
+}
+.modal-overlay.show {
+    opacity: 1; visibility: visible;
+}
+.modal-close-btn {
+    position: absolute; top: 20px; right: 20px; z-index: 10000;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2); color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 1.4rem; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: var(--transition);
+}
+.modal-close-btn:active, .modal-close-btn:hover {
+    background: rgba(255, 82, 82, 0.9); border-color: var(--error); transform: scale(1.1);
+}
+.lightbox-content {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    max-width: 95vw; max-height: 85vh; text-align: center; pointer-events: auto;
+}
+.lightbox-img {
+    max-width: 100%; max-height: 70vh; object-fit: contain;
+    border-radius: var(--radius-lg); box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    transition: transform 0.3s ease; cursor: zoom-in;
+}
+.lightbox-img.zoomed {
+    transform: scale(1.4); cursor: zoom-out;
+}
+
 
 

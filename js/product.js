@@ -191,6 +191,8 @@ function toggleDetailsWishlist(productId, btn) {
 }
 
 // --- Image Lightbox / Zoom ---
+let isLightboxOpen = false;
+
 function openLightbox(imageUrl) {
     triggerHaptic();
     let modal = document.getElementById('lightbox-modal');
@@ -198,28 +200,41 @@ function openLightbox(imageUrl) {
         modal = document.createElement('div');
         modal.id = 'lightbox-modal';
         modal.className = 'modal-overlay';
-        modal.style.alignItems = 'center';
         document.body.appendChild(modal);
     }
 
     modal.innerHTML = `
-        <button class="modal-close-btn" style="top:20px; right:20px; left:auto;" onclick="closeLightbox()">✕</button>
-        <div class="lightbox-content">
+        <button class="modal-close-btn" onclick="closeLightbox(event)" title="إغلاق">✕</button>
+        <div class="lightbox-content" onclick="event.stopPropagation()">
             <img src="${imageUrl}" class="lightbox-img" id="lightbox-img-el" onclick="this.classList.toggle('zoomed')">
-            <p style="color:var(--text-secondary); font-size:0.78rem; margin-top:12px;">انقر للتكبير / التصغير 🔍</p>
+            <p style="color:rgba(255,255,255,0.7); font-size:0.78rem; margin-top:12px;">انقر للتقريب / التصغير 🔍</p>
+            <button onclick="closeLightbox(event)" style="margin-top:16px; padding:8px 20px; border-radius:var(--radius-full); background:rgba(255,255,255,0.2); color:#fff; font-size:0.85rem; border:1px solid rgba(255,255,255,0.3);">إغلاق المعاينة ✕</button>
         </div>
     `;
 
-    modal.onclick = (e) => {
-        if (e.target === modal) closeLightbox();
-    };
+    modal.onclick = () => closeLightbox();
 
     setTimeout(() => modal.classList.add('show'), 10);
+    isLightboxOpen = true;
+
+    // Listen for Escape key
+    window.addEventListener('keydown', handleLightboxKeydown);
 }
 
-function closeLightbox() {
+function handleLightboxKeydown(e) {
+    if (e.key === 'Escape' && isLightboxOpen) {
+        closeLightbox();
+    }
+}
+
+function closeLightbox(e) {
+    if (e) e.stopPropagation();
     const modal = document.getElementById('lightbox-modal');
-    if (modal) modal.classList.remove('show');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+    isLightboxOpen = false;
+    window.removeEventListener('keydown', handleLightboxKeydown);
 }
 
 function addCurrentToCart(btnElement) {
