@@ -68,8 +68,6 @@ function renderProductDetails() {
     } else if (p.image_url) {
         imagesList = [p.image_url];
     }
-
-    let html = '';
     
     // Hero Image & Gallery
     if (imagesList.length > 0) {
