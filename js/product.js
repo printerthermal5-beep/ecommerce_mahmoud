@@ -20,21 +20,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadProductDetails(id) {
+    // 1. Instant rendering from session cache if user clicked from store
+    const cached = sessionStorage.getItem('current_product_' + id);
+    if (cached) {
+        try {
+            currentProduct = JSON.parse(cached);
+            renderProductDetails();
+            loadRelatedProducts(currentProduct.category_id, currentProduct.id); // Non-blocking
+        } catch (e) {
+            console.error('Error parsing cached product:', e);
+        }
+    }
+
+    // 2. Fetch fresh details from Supabase in background
     const { data, error } = await db
         .from('products')
         .select('*, categories(name, icon)')
         .eq('id', id)
         .single();
         
-    if (error || !data) {
+    if (!error && data) {
+        currentProduct = data;
+        renderProductDetails();
+        loadRelatedProducts(data.category_id, data.id); // Non-blocking background fetch
+    } else if (!currentProduct) {
         console.error('Error fetching product:', error);
         showError('المنتج غير موجود أو تم حذفه');
-        return;
     }
-    
-    currentProduct = data;
-    renderProductDetails();
-    await loadRelatedProducts(data.category_id, data.id);
 }
 
 function renderProductDetails() {

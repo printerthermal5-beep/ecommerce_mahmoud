@@ -102,6 +102,13 @@ function handleSortChange(sortVal) {
     renderProducts();
 }
 
+function saveClickedProduct(id) {
+    const product = allProducts.find(p => p.id === id);
+    if (product) {
+        sessionStorage.setItem('current_product_' + id, JSON.stringify(product));
+    }
+}
+
 function renderProducts() {
     const grid = document.getElementById('products-grid');
     if (!grid) return;
@@ -164,7 +171,7 @@ function renderProducts() {
                 👁️
             </button>
 
-            <a href="./product.html?id=${product.id}" style="display:block;">
+            <a href="./product.html?id=${product.id}" onclick="saveClickedProduct('${product.id}')" style="display:block;">
                 ${product.image_url
                     ? `<img class="product-image" src="${product.image_url}" alt="${product.name}" loading="lazy">`
                     : `<div class="product-image-placeholder">🏺</div>`
@@ -172,7 +179,7 @@ function renderProducts() {
             </a>
             
             <div class="product-info">
-                <a href="./product.html?id=${product.id}" class="product-name" style="text-decoration:none; color:inherit;">${product.name}</a>
+                <a href="./product.html?id=${product.id}" onclick="saveClickedProduct('${product.id}')" class="product-name" style="text-decoration:none; color:inherit;">${product.name}</a>`     <a href="./product.html?id=${product.id}" class="product-name" style="text-decoration:none; color:inherit;">${product.name}</a>
                 <div class="product-price-row">
                     <span class="product-price">${formatPrice(displayPrice)}</span>
                     ${hasDiscount ? `<span class="product-original-price">${formatPrice(product.price)}</span>` : ''}
