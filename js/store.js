@@ -206,6 +206,31 @@ function toggleCardWishlist(productId, btn) {
 }
 
 // --- Direct Quantity Controls on Cards ---
+function updateCardActionUI(productId) {
+    const actionEl = document.getElementById(`card-action-${productId}`);
+    if (!actionEl) return;
+
+    const cart = CartManager.getCart();
+    const item = cart.find(i => i.id === productId);
+    const cartQty = item ? item.quantity : 0;
+
+    if (cartQty > 0) {
+        actionEl.innerHTML = `
+            <div class="card-qty-controls">
+                <button class="card-qty-btn minus" onclick="changeCardQty('${productId}', -1)">-</button>
+                <span class="card-qty-val">${cartQty} في السلة</span>
+                <button class="card-qty-btn" onclick="changeCardQty('${productId}', 1)">+</button>
+            </div>
+        `;
+    } else {
+        actionEl.innerHTML = `
+            <button class="add-to-cart-btn" onclick="addToCart('${productId}', this)">
+                <span>🛒</span> أضف للسلة
+            </button>
+        `;
+    }
+}
+
 function changeCardQty(productId, delta) {
     const cart = CartManager.getCart();
     const item = cart.find(i => i.id === productId);
@@ -218,7 +243,7 @@ function changeCardQty(productId, delta) {
         const newQty = item.quantity + delta;
         CartManager.updateQuantity(productId, newQty);
     }
-    renderProducts();
+    updateCardActionUI(productId);
 }
 
 // --- Add to Cart ---
@@ -228,7 +253,7 @@ function addToCart(productId, btnElement) {
 
     CartManager.addItem(product);
     showToast(`تم إضافة "${product.name}" للسلة`);
-    renderProducts();
+    updateCardActionUI(productId);
 }
 
 // --- Quick View Modal ---
