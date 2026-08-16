@@ -139,6 +139,8 @@ async function loadAdminProducts() {
 function openProductModal() {
     document.getElementById('product-form').reset();
     document.getElementById('prod-id').value = '';
+    const urlInput = document.getElementById('prod-image-url-input');
+    if (urlInput) urlInput.value = '';
     currentProductExistingImages = [];
     renderExistingImages();
     document.getElementById('modal-title').textContent = 'إضافة منتج جديد';
@@ -159,6 +161,8 @@ async function editProduct(id) {
     document.getElementById('prod-discount-price').value = prod.discount_price || '';
     document.getElementById('prod-category').value = prod.category_id || '';
     document.getElementById('prod-desc').value = prod.description || '';
+    const urlInput = document.getElementById('prod-image-url-input');
+    if (urlInput) urlInput.value = '';
 
     // Handle existing images
     if (Array.isArray(prod.images) && prod.images.length > 0) {
@@ -212,36 +216,53 @@ async function handleProductSubmit(e) {
 
     const id = document.getElementById('prod-id').value;
     const fileInput = document.getElementById('prod-image-file');
+    const directUrlInput = document.getElementById('prod-image-url-input');
     
     let newlyUploadedUrls = [];
 
+    // Direct URL if entered
+    if (directUrlInput && directUrlInput.value.trim()) {
+        newlyUploadedUrls.push(directUrlInput.value.trim());
+    }
+
     try {
         // Upload multiple selected files if any
-        if (fileInput.files && fileInput.files.length > 0) {
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
             btn.innerHTML = `جاري رفع ${fileInput.files.length} صور... ⏳`;
+            let uploadErrorsCount = 0;
             
             for (let i = 0; i < fileInput.files.length; i++) {
                 const file = fileInput.files[i];
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+                const fileExt = file.name.split('.').pop() || 'png';
+                const fileName = `${Math.random().toString(36).substring(2, 12)}_${Date.now()}.${fileExt}`;
                 const filePath = `products/${fileName}`;
 
-                const { error: uploadError } = await db.storage
-                    .from('products')
-                    .upload(filePath, file);
+                try {
+                    const { error: uploadError } = await db.storage
+                        .from('products')
+                        .upload(filePath, file, { cacheControl: '3600', upsert: true });
 
-                if (uploadError) {
-                    console.error('Error uploading file:', uploadError);
-                    continue; // Skip failed file
+                    if (uploadError) {
+                        console.error(`Error uploading file ${file.name}:`, uploadError);
+                        uploadErrorsCount++;
+                        continue;
+                    }
+
+                    const { data } = db.storage
+                        .from('products')
+                        .getPublicUrl(filePath);
+
+                    if (data && data.publicUrl) {
+                        newlyUploadedUrls.push(data.publicUrl);
+                    }
+                } catch (upErr) {
+                    console.error('Upload exception:', upErr);
+                    uploadErrorsCount++;
                 }
+            }
 
-                const { data: { publicUrl } } = db.storage
-                    .from('products')
-                    .getPublicUrl(filePath);
-
-                if (publicUrl) {
-                    newlyUploadedUrls.push(publicUrl);
-                }
+            if (uploadErrorsCount > 0 && newlyUploadedUrls.length === 0) {
+                showToast('تعذر رفع الصور عبر السيرفر. يمكنك استخدام رابط الصورة المباشر', 'warning');
             }
         }
 
@@ -263,16 +284,29 @@ async function handleProductSubmit(e) {
             is_available: true
         };
 
-        let error;
+        let dbError;
         if (id) {
             const res = await db.from('products').update(productData).eq('id', id);
-            error = res.error;
+            dbError = res.error;
         } else {
             const res = await db.from('products').insert([productData]);
-            error = res.error;
+            dbError = res.error;
         }
 
-        if (error) throw error;
+        // Fallback: If DB schema doesn't have 'images' column yet, retry without 'images' field
+        if (dbError && dbError.message && dbError.message.includes('images')) {
+            console.warn('Retrying product save without images JSON column fallback...', dbError);
+            delete productData.images;
+            if (id) {
+                const retryRes = await db.from('products').update(productData).eq('id', id);
+                dbError = retryRes.error;
+            } else {
+                const retryRes = await db.from('products').insert([productData]);
+                dbError = retryRes.error;
+            }
+        }
+
+        if (dbError) throw dbError;
 
         showToast(id ? 'تم تعديل المنتج بنجاح 🎉' : 'تم إضافة المنتج بنجاح 🎉');
         closeModal('product-modal');
