@@ -36,6 +36,7 @@
     --font-en: 'Inter', sans-serif;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --header-h: 60px;
+    --announcement-h: 30px;
     --bottom-nav-h: 65px;
 }
 
@@ -95,6 +96,13 @@ ul, ol { list-style: none; }
     width: 18px; height: 18px; border-radius: 50%;
     display: none; align-items: center; justify-content: center;
 }
+.header-btn .wishlist-badge {
+    position: absolute; top: -4px; right: -4px;
+    background: var(--error); color: #fff;
+    font-size: 0.65rem; font-weight: 700; font-family: var(--font-en);
+    width: 18px; height: 18px; border-radius: 50%;
+    display: none; align-items: center; justify-content: center;
+}
 
 /* --- Page Content --- */
 .page-content { padding-top: calc(var(--header-h) + 20px); min-height: 100vh; }
@@ -129,9 +137,12 @@ ul, ol { list-style: none; }
 
 /* --- Announcement Bar --- */
 .announcement-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+    height: var(--announcement-h);
+    display: flex; align-items: center; justify-content: center;
     background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-dark));
     color: var(--bg-primary); text-align: center;
-    padding: 6px 16px; font-size: 0.75rem; font-weight: 700;
+    padding: 0 16px; font-size: 0.75rem; font-weight: 700;
     overflow: hidden; white-space: nowrap;
 }
 .announcement-bar span {
@@ -531,9 +542,10 @@ ul, ol { list-style: none; }
     background: rgba(255, 82, 82, 0.2); border-color: var(--error);
 }
 
-/* --- Quick View Button on Cards --- */
+/* --- Quick View Button on Cards (anchored to the product image area) --- */
+.product-media { position: relative; }
 .quick-view-card-btn {
-    position: absolute; bottom: 80px; right: 8px; z-index: 10;
+    position: absolute; bottom: 8px; right: 8px; z-index: 10;
     width: 30px; height: 30px; border-radius: 50%;
     background: rgba(10, 10, 15, 0.65); backdrop-filter: blur(8px);
     border: 1px solid rgba(255,255,255,0.1);
@@ -700,19 +712,21 @@ ul, ol { list-style: none; }
 }
 
 /* =============================================
-   MODAL OVERLAY & LIGHTBOX
+   LIGHTBOX (scoped to #lightbox-modal so the
+   generic .modal-overlay keeps the bottom-sheet
+   behavior used by the Quick View modal)
    ============================================= */
-.modal-overlay {
+#lightbox-modal {
     position: fixed; inset: 0; z-index: 9999;
     background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease;
     padding: 20px;
 }
-.modal-overlay.show {
+#lightbox-modal.show {
     opacity: 1; visibility: visible;
 }
-.modal-close-btn {
+#lightbox-modal .modal-close-btn {
     position: absolute; top: 20px; right: 20px; z-index: 10000;
     width: 44px; height: 44px; border-radius: 50%;
     background: rgba(255, 255, 255, 0.2); color: #ffffff;
@@ -720,7 +734,7 @@ ul, ol { list-style: none; }
     font-size: 1.4rem; display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: var(--transition);
 }
-.modal-close-btn:active, .modal-close-btn:hover {
+#lightbox-modal .modal-close-btn:active, #lightbox-modal .modal-close-btn:hover {
     background: rgba(255, 82, 82, 0.9); border-color: var(--error); transform: scale(1.1);
 }
 .lightbox-content {

@@ -44,7 +44,7 @@ function renderMyOrders() {
 
                 <div style="margin: 10px 0;">
                     ${order.items.map(item => `
-                        <div style="display:flex; justify-space-between; font-size:0.85rem; color:var(--text-secondary); margin-bottom:4px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--text-secondary); margin-bottom:4px;">
                             <span>${item.quantity} × ${item.name}</span>
                             <span style="font-family:var(--font-en); font-weight:600; color:var(--text-primary);">${formatPrice(item.price * item.quantity)}</span>
                         </div>

@@ -229,7 +229,8 @@ function updateFloatingCartBar() {
     const count = CartManager.getItemCount();
     
     const pageName = window.location.pathname.split('/').pop();
-    const isCartOrCheckoutPage = pageName === 'cart.html' || pageName === 'checkout.html';
+    // Pages that already have their own bottom action bar (cart, checkout, product)
+    const isCartOrCheckoutPage = pageName === 'cart.html' || pageName === 'checkout.html' || pageName === 'product.html';
 
     if (count === 0 || isCartOrCheckoutPage) {
         if (bar) bar.style.display = 'none';

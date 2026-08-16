@@ -2,7 +2,7 @@
     "name": "متجر النور - كماليات وأنتيكات",
     "short_name": "النور",
     "description": "متجر النور لبيع أفخم الكماليات والأنتيكات والتحف والفازات",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#0A0A0F",
     "theme_color": "#C8A45C",
@@ -65,7 +65,7 @@
         {
             "name": "السلة",
             "short_name": "السلة",
-            "url": "/cart.html",
+            "url": "./cart.html",
             "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
         }
     ]

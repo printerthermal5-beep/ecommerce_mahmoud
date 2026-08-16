@@ -129,7 +129,12 @@ async function handleCheckoutSubmit(e) {
             .from('order_items')
             .insert(orderItems);
 
-        if (itemsError) throw itemsError;
+        if (itemsError) {
+            // Best-effort cleanup: remove the just-created order so a retry
+            // does not leave behind an empty/duplicate order
+            await db.from('orders').delete().eq('id', orderData.id).catch(() => {});
+            throw itemsError;
+        }
 
         // Save order locally for "My Orders" history page
         OrderStorageManager.saveOrder({
@@ -162,7 +167,11 @@ function showSuccessState(orderNumber, customerData, cart, totalAmount) {
     // Generate WhatsApp Message
     const waMessage = formatWhatsAppMessage(orderNumber, customerData, cart, totalAmount);
     const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
-    
+
+    // Fallback link in case the browser blocks the auto-open popup
+    const waFallback = document.getElementById('wa-fallback-btn');
+    if (waFallback) waFallback.href = waUrl;
+
     // Open WhatsApp after a short delay
     setTimeout(() => {
         window.open(waUrl, '_blank');

@@ -167,16 +167,17 @@ function renderProducts() {
                 ${isWishlisted ? '❤️' : '🤍'}
             </button>
 
-            <button class="quick-view-card-btn" onclick="openQuickView('${product.id}')" title="معاينة سريعة">
-                👁️
-            </button>
-
-            <a href="./product.html?id=${product.id}" onclick="saveClickedProduct('${product.id}')" style="display:block;">
-                ${product.image_url
-                    ? `<img class="product-image" src="${product.image_url}" alt="${product.name}" loading="lazy">`
-                    : `<div class="product-image-placeholder">🏺</div>`
-                }
-            </a>
+            <div class="product-media">
+                <a href="./product.html?id=${product.id}" onclick="saveClickedProduct('${product.id}')" style="display:block;">
+                    ${product.image_url
+                        ? `<img class="product-image" src="${product.image_url}" alt="${product.name}" loading="lazy">`
+                        : `<div class="product-image-placeholder">🏺</div>`
+                    }
+                </a>
+                <button class="quick-view-card-btn" onclick="openQuickView('${product.id}')" title="معاينة سريعة">
+                    👁️
+                </button>
+            </div>
             
             <div class="product-info">
                 <a href="./product.html?id=${product.id}" onclick="saveClickedProduct('${product.id}')" class="product-name" style="text-decoration:none; color:inherit;">${product.name}</a>
