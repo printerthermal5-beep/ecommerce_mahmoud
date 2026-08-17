@@ -2,119 +2,324 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>لوحة التحكم | متجر النور</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0A0A0F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .admin-layout { display: flex; min-height: 100vh; }
+        /* Admin Base Layout */
+        .admin-layout { display: flex; min-height: 100vh; background: var(--bg-primary); }
+        
+        /* Desktop Sidebar */
         .sidebar {
-            width: 250px; background: var(--bg-card); border-left: 1px solid var(--border);
-            padding: 24px 0; display: flex; flex-direction: column;
+            width: 260px; background: var(--bg-card); border-left: 1px solid var(--border);
+            padding: 24px 0; display: flex; flex-direction: column; flex-shrink: 0;
+            position: sticky; top: 0; height: 100vh; overflow-y: auto;
         }
-        .sidebar-brand { padding: 0 24px; margin-bottom: 32px; font-size: 1.2rem; font-weight: 700; color: var(--gold); }
+        .sidebar-brand {
+            padding: 0 24px; margin-bottom: 28px; font-size: 1.25rem; font-weight: 800;
+            color: var(--gold); display: flex; align-items: center; justify-content: space-between;
+        }
+        .sidebar-brand-sub { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; display: block; margin-top: 2px; }
+        
+        .nav-links-container { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
         .nav-link {
-            padding: 12px 24px; color: var(--text-secondary); display: flex; align-items: center; gap: 12px;
-            transition: var(--transition); border-right: 3px solid transparent; cursor: pointer;
+            padding: 12px 16px; color: var(--text-secondary); display: flex; align-items: center; gap: 12px;
+            transition: var(--transition); border-radius: var(--radius-md); cursor: pointer;
+            font-size: 0.92rem; font-weight: 600;
         }
         .nav-link:hover, .nav-link.active {
-            background: rgba(200,164,92,0.1); color: var(--gold); border-right-color: var(--gold);
+            background: rgba(200,164,92,0.12); color: var(--gold-light); border-right: 3px solid var(--gold);
         }
-        .main-content { flex: 1; padding: 32px; background: var(--bg-primary); }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 32px; }
+
+        /* Main Content Container */
+        .main-content { flex: 1; padding: 28px 32px; background: var(--bg-primary); min-width: 0; }
+        
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 28px; }
         .stat-card {
             background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-            padding: 24px; display: flex; flex-direction: column;
+            padding: 20px; display: flex; align-items: center; justify-content: space-between;
+            transition: var(--transition);
         }
-        .stat-value { font-size: 2rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-en); margin-top: 8px; }
-        .stat-label { color: var(--text-secondary); font-size: 0.9rem; }
-        
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
-        .data-table th, .data-table td { padding: 16px; text-align: right; border-bottom: 1px solid var(--border); }
-        .data-table th { color: var(--text-secondary); font-weight: 600; font-size: 0.85rem; }
-        .data-table tr:hover { background: var(--bg-elevated); }
-        
-        .status-badge {
-            padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;
+        .stat-card:hover { border-color: var(--border-active); transform: translateY(-2px); box-shadow: var(--shadow-gold); }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-label { color: var(--text-secondary); font-size: 0.82rem; font-weight: 500; }
+        .stat-value { font-size: 1.7rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-en); margin-top: 4px; }
+        .stat-icon-wrapper {
+            width: 48px; height: 48px; border-radius: var(--radius-md);
+            background: rgba(200, 164, 92, 0.1); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
         }
-        .status-pending { background: rgba(255,193,7,0.1); color: var(--warning); }
-        .status-confirmed { background: rgba(76,175,80,0.1); color: var(--success); }
-        
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000;
-            display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
-        }
-        .modal.show { display: flex; }
-        .modal-content {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-            padding: 32px; width: 100%; max-width: 500px;
-        }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .modal-close { background: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
 
-        /* Responsive Styles */
+        /* Quick Action Grid */
+        .quick-actions-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px;
+        }
+        .action-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+            padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+            transition: var(--transition);
+        }
+        .action-card:hover { border-color: var(--gold); background: var(--bg-elevated); transform: translateY(-2px); }
+        .action-card-icon { font-size: 1.5rem; }
+        .action-card-text { display: flex; flex-direction: column; }
+        .action-card-title { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
+        .action-card-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* Search & Filter Toolbar */
+        .admin-toolbar {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+            background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);
+        }
+        .admin-search-box {
+            flex: 1; min-width: 200px; display: flex; align-items: center; gap: 8px;
+            background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-full); padding: 8px 16px;
+        }
+        .admin-search-box input { flex: 1; background: none; border: none; color: var(--text-primary); font-size: 0.85rem; }
+        .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .filter-chip {
+            padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 600;
+            background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; transition: var(--transition);
+        }
+        .filter-chip.active, .filter-chip:hover { background: var(--gold); color: var(--bg-primary); border-color: var(--gold); }
+
+        /* Tables & Cards */
+        .data-table-wrapper { width: 100%; border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden; background: var(--bg-card); }
+        .data-table { width: 100%; border-collapse: collapse; text-align: right; }
+        .data-table th, .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+        .data-table th { background: var(--bg-elevated); color: var(--text-secondary); font-weight: 700; font-size: 0.8rem; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Mobile Card Styling */
+        .admin-mobile-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 16px; margin-bottom: 12px; transition: var(--transition);
+        }
+        .admin-mobile-card:hover { border-color: var(--border-active); }
+        .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .card-title-text { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); }
+        .card-sub-text { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .card-actions-row { display: flex; gap: 8px; margin-top: 12px; pt-2; border-top: 1px dashed var(--border); padding-top: 10px; }
+
+        /* Responsive Mobile Navigation & Header */
+        .admin-mobile-header {
+            display: none; position: sticky; top: 0; z-index: 90;
+            background: rgba(16, 16, 24, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 12px 16px;
+            align-items: center; justify-content: space-between;
+        }
+        .admin-mobile-header .brand-title {
+            font-size: 1.1rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .admin-bottom-nav {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+            height: var(--bottom-nav-h); background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border); align-items: center; justify-content: space-around;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .admin-nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 6px 12px; color: var(--text-muted); font-size: 0.68rem; font-weight: 600;
+            background: none; border: none; transition: var(--transition); cursor: pointer; position: relative;
+        }
+        .admin-nav-item.active { color: var(--gold); font-weight: 800; }
+        .admin-nav-item.active::after {
+            content: ''; position: absolute; top: -1px; width: 24px; height: 3px;
+            background: var(--gold); border-radius: 2px;
+        }
+        .admin-nav-item .nav-icon { font-size: 1.25rem; }
+
+        /* Modal Enhancements for Mobile Bottom Sheet */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal.show { display: flex; opacity: 1; }
+        .modal-content {
+            background: var(--bg-card); border: 1px solid var(--border-active); border-radius: var(--radius-xl);
+            padding: 28px; width: 92%; max-width: 540px; max-height: 88vh; overflow-y: auto;
+            box-shadow: var(--shadow-lg); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Responsive Breakpoints */
         @media (max-width: 768px) {
-            .admin-layout { flex-direction: column; }
-            .sidebar { width: 100%; border-left: none; border-bottom: 1px solid var(--border); padding: 16px 0; flex-direction: column; }
-            .sidebar-brand { text-align: center; margin-bottom: 16px; }
-            .nav-links-container { display: flex; flex-wrap: wrap; justify-content: center; padding: 0 16px; gap: 8px; }
-            .nav-link { border-right: none; padding: 8px 16px; white-space: nowrap; border-radius: var(--radius-md); border: 1px solid var(--border); font-size: 0.85rem; }
-            .nav-link.active, .nav-link:hover { border-color: var(--gold); }
+            .admin-layout { flex-direction: column; padding-bottom: calc(var(--bottom-nav-h) + 20px); }
+            .sidebar { display: none; }
+            .admin-mobile-header { display: flex; }
+            .admin-bottom-nav { display: flex; }
             .main-content { padding: 16px; }
-            .data-table-wrapper { overflow-x: auto; margin-top: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); }
-            .data-table { margin-top: 0; min-width: 600px; }
-            .modal-content { padding: 24px 16px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+            .stat-card { padding: 14px; }
+            .stat-value { font-size: 1.35rem; }
+            .stat-icon-wrapper { width: 38px; height: 38px; font-size: 1.1rem; }
+            .desktop-table-view { display: none !important; }
+            .mobile-cards-view { display: flex !important; flex-direction: column; }
+            
+            .modal { align-items: flex-end; }
+            .modal-content {
+                width: 100%; max-width: 100%; border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
+            }
+        }
+
+        @media (min-width: 769px) {
+            .desktop-table-view { display: block; }
+            .mobile-cards-view { display: none !important; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Mobile Top App Header -->
+    <header class="admin-mobile-header">
+        <div class="brand-title">النور للأنتيكات ⚙️</div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="../index.html" target="_blank" class="btn-secondary" style="padding: 6px 12px; font-size: 0.78rem; border-radius: var(--radius-full);">🛍️ المتجر</a>
+            <button onclick="logout()" class="btn-secondary" style="padding: 6px 10px; font-size: 0.78rem; color: var(--error); border-color: rgba(255,82,82,0.3); border-radius: var(--radius-full);">🚪</button>
+        </div>
+    </header>
+
     <div class="admin-layout">
-        <!-- Sidebar -->
+        <!-- Desktop Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="sidebar-brand">النور للأنتيكات <span>⚙️</span></div>
+            <div class="sidebar-brand">
+                <div>
+                    <div>النور للأنتيكات</div>
+                    <span class="sidebar-brand-sub">لوحة الإدارة الرئيسية ⚙️</span>
+                </div>
+            </div>
             <div class="nav-links-container">
-                <a class="nav-link active" onclick="switchTab('dashboard')">📊 لوحة التحكم</a>
-                <a class="nav-link" onclick="switchTab('orders')">📦 الطلبات</a>
-                <a class="nav-link" onclick="switchTab('products')">🏺 المنتجات</a>
-                <a class="nav-link" onclick="switchTab('categories')">📁 التصنيفات</a>
-                <a class="nav-link" onclick="logout()" style="color: var(--error);">🚪 تسجيل الخروج</a>
+                <a class="nav-link active" onclick="switchTab('dashboard')"><span>📊</span> نظرة عامة</a>
+                <a class="nav-link" onclick="switchTab('orders')"><span>📦</span> إدارة الطلبات</a>
+                <a class="nav-link" onclick="switchTab('products')"><span>🏺</span> إدارة المنتجات</a>
+                <a class="nav-link" onclick="switchTab('categories')"><span>📁</span> إدارة التصنيفات</a>
+                <a href="../index.html" target="_blank" class="nav-link" style="margin-top: 16px; color: var(--gold-light);"><span>🛍️</span> معاينة المتجر</a>
+                <a class="nav-link" onclick="logout()" style="color: var(--error); margin-top: auto;"><span>🚪</span> تسجيل الخروج</a>
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Main Content Area -->
         <main class="main-content">
             
-            <!-- Dashboard Tab -->
+            <!-- Dashboard Tab (Overview) -->
             <div id="tab-dashboard" class="tab-content">
-                <h2 style="margin-bottom: 24px;">نظرة عامة</h2>
+                <h2 style="margin-bottom: 20px; font-weight: 800;">📊 لوحة التحكم والإحصائيات</h2>
+                
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <span class="stat-label">إجمالي الطلبات</span>
-                        <span class="stat-value" id="stat-orders">0</span>
+                        <div class="stat-info">
+                            <span class="stat-label">إجمالي الطلبات</span>
+                            <span class="stat-value" id="stat-orders">0</span>
+                        </div>
+                        <div class="stat-icon-wrapper">📦</div>
                     </div>
                     <div class="stat-card">
-                        <span class="stat-label">المبيعات</span>
-                        <span class="stat-value" id="stat-sales" style="color: var(--gold);">0</span>
+                        <div class="stat-info">
+                            <span class="stat-label">إجمالي المبيعات</span>
+                            <span class="stat-value" id="stat-sales" style="color: var(--gold-light);">0</span>
+                        </div>
+                        <div class="stat-icon-wrapper">💰</div>
                     </div>
                     <div class="stat-card">
-                        <span class="stat-label">المنتجات</span>
-                        <span class="stat-value" id="stat-products">0</span>
+                        <div class="stat-info">
+                            <span class="stat-label">المنتجات النشطة</span>
+                            <span class="stat-value" id="stat-products">0</span>
+                        </div>
+                        <div class="stat-icon-wrapper">🏺</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">أقسام المتجر</span>
+                            <span class="stat-value" id="stat-categories">0</span>
+                        </div>
+                        <div class="stat-icon-wrapper">📁</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Grid -->
+                <h3 style="margin-bottom: 14px; font-size: 1.05rem; font-weight: 700;">⚡ إجراءات سريعة</h3>
+                <div class="quick-actions-grid">
+                    <div class="action-card" onclick="openProductModal()">
+                        <span class="action-card-icon">➕</span>
+                        <div class="action-card-text">
+                            <span class="action-card-title">إضافة منتج</span>
+                            <span class="action-card-sub">رفع منتج جديد للمتجر</span>
+                        </div>
+                    </div>
+                    <div class="action-card" onclick="exportOrdersToCSV()">
+                        <span class="action-card-icon">📊</span>
+                        <div class="action-card-text">
+                            <span class="action-card-title">تصدير المبيعات</span>
+                            <span class="action-card-sub">تحميل شيت Excel بالطلبات</span>
+                        </div>
+                    </div>
+                    <div class="action-card" onclick="openCategoryModal()">
+                        <span class="action-card-icon">📁</span>
+                        <div class="action-card-text">
+                            <span class="action-card-title">إضافة قسم</span>
+                            <span class="action-card-sub">تصنيف جديد للتحف</span>
+                        </div>
+                    </div>
+                    <a href="../index.html" target="_blank" class="action-card">
+                        <span class="action-card-icon">🌐</span>
+                        <div class="action-card-text">
+                            <span class="action-card-title">زيارة المتجر</span>
+                            <span class="action-card-sub">معاينة واجهة المشتري</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Recent Orders Summary Card -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700;">📦 أحدث الطلبات المباشرة</h3>
+                    <button class="btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;" onclick="switchTab('orders')">عرض الكل ➔</button>
+                </div>
+                <div id="recent-orders-container" class="admin-mobile-card" style="padding: 0;">
+                    <div id="recent-orders-list" style="padding: 12px;">جاري التحميل...</div>
                 </div>
             </div>
 
             <!-- Orders Tab -->
             <div id="tab-orders" class="tab-content" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-                    <h2>إدارة الطلبات</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <h2 style="font-weight: 800;">📦 إدارة الطلبات</h2>
                     <button class="btn-primary" style="width: auto; background: var(--success);" onclick="exportOrdersToCSV()">📊 تصدير الطلبات Excel</button>
                 </div>
-                <div class="data-table-wrapper">
+
+                <!-- Toolbar & Filters -->
+                <div class="admin-toolbar">
+                    <div class="admin-search-box">
+                        <span>🔍</span>
+                        <input type="text" id="orders-search-input" placeholder="ابحث باسم العميل، الهاتف، رقم الطلب..." oninput="handleOrdersSearch(this.value)">
+                    </div>
+                    <div class="filter-chips">
+                        <button class="filter-chip active" onclick="filterOrdersByStatus('all', this)">الكل</button>
+                        <button class="filter-chip" onclick="filterOrdersByStatus('pending', this)">قيد المراجعة ⏳</button>
+                        <button class="filter-chip" onclick="filterOrdersByStatus('confirmed', this)">مؤكد ✅</button>
+                    </div>
+                </div>
+
+                <!-- Desktop Table View -->
+                <div class="desktop-table-view data-table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>رقم الطلب</th>
-                                <th>العميل</th>
+                                <th>العميل والهاتف</th>
+                                <th>العنوان</th>
                                 <th>الإجمالي</th>
                                 <th>التاريخ</th>
                                 <th>الحالة</th>
@@ -122,112 +327,165 @@
                             </tr>
                         </thead>
                         <tbody id="orders-tbody">
-                            <!-- Orders inserted here -->
+                            <!-- Orders rows -->
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div class="mobile-cards-view" id="orders-mobile-list">
+                    <!-- Mobile Order Cards -->
                 </div>
             </div>
 
             <!-- Products Tab -->
             <div id="tab-products" class="tab-content" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-                    <h2>إدارة المنتجات</h2>
-                    <button class="btn-primary" style="width: auto;" onclick="openProductModal()">+ إضافة منتج</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <h2 style="font-weight: 800;">🏺 إدارة المنتجات</h2>
+                    <button class="btn-primary" style="width: auto;" onclick="openProductModal()">+ إضافة منتج جديد</button>
                 </div>
-                <div class="data-table-wrapper">
+
+                <!-- Toolbar & Search -->
+                <div class="admin-toolbar">
+                    <div class="admin-search-box">
+                        <span>🔍</span>
+                        <input type="text" id="products-search-input" placeholder="ابحث باسم المنتج..." oninput="handleProductsSearch(this.value)">
+                    </div>
+                </div>
+
+                <!-- Desktop Table View -->
+                <div class="desktop-table-view data-table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>المنتج</th>
+                                <th>المنتج والصورة</th>
                                 <th>السعر</th>
                                 <th>التصنيف</th>
-                                <th>متاح</th>
-                                <th>إجراء</th>
+                                <th>التوفر</th>
+                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="products-tbody">
-                            <!-- Products inserted here -->
+                            <!-- Products rows -->
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div class="mobile-cards-view" id="products-mobile-list">
+                    <!-- Mobile Product Cards -->
                 </div>
             </div>
 
             <!-- Categories Tab -->
             <div id="tab-categories" class="tab-content" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-                    <h2>إدارة التصنيفات (الأقسام)</h2>
-                    <button class="btn-primary" style="width: auto;" onclick="openCategoryModal()">+ إضافة قسم</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <h2 style="font-weight: 800;">📁 إدارة التصنيفات (الأقسام)</h2>
+                    <button class="btn-primary" style="width: auto;" onclick="openCategoryModal()">+ إضافة قسم جديد</button>
                 </div>
-                <div class="data-table-wrapper">
+
+                <!-- Desktop Table View -->
+                <div class="desktop-table-view data-table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>القسم</th>
-                                <th>الأيقونة/الإيموجي</th>
-                                <th>مفعل</th>
-                                <th>إجراء</th>
+                                <th>اسم القسم</th>
+                                <th>الأيقونة / الإيموجي</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="categories-tbody">
-                            <!-- Categories inserted here -->
+                            <!-- Categories rows -->
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div class="mobile-cards-view" id="categories-mobile-list">
+                    <!-- Mobile Category Cards -->
                 </div>
             </div>
 
         </main>
     </div>
 
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="admin-bottom-nav">
+        <button class="admin-nav-item active" onclick="switchTab('dashboard')">
+            <span class="nav-icon">📊</span>
+            <span>الرئيسية</span>
+        </button>
+        <button class="admin-nav-item" onclick="switchTab('orders')">
+            <span class="nav-icon">📦</span>
+            <span>الطلبات</span>
+        </button>
+        <button class="admin-nav-item" onclick="switchTab('products')">
+            <span class="nav-icon">🏺</span>
+            <span>المنتجات</span>
+        </button>
+        <button class="admin-nav-item" onclick="switchTab('categories')">
+            <span class="nav-icon">📁</span>
+            <span>التصنيفات</span>
+        </button>
+        <button class="admin-nav-item" onclick="logout()" style="color: var(--error);">
+            <span class="nav-icon">🚪</span>
+            <span>خروج</span>
+        </button>
+    </nav>
+
     <!-- Category Modal -->
     <div class="modal" id="category-modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="cat-modal-title">إضافة قسم جديد</h3>
-                <button class="modal-close" onclick="closeModal('category-modal')">✕</button>
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="cat-modal-title" style="font-weight: 800;">إضافة قسم جديد</h3>
+                <button class="modal-close" onclick="closeModal('category-modal')" style="background: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
             </div>
             <form id="category-form">
                 <input type="hidden" id="cat-id">
                 <div class="form-group">
-                    <label class="form-label">اسم القسم</label>
-                    <input type="text" id="cat-name" class="form-input" required>
+                    <label class="form-label">اسم القسم *</label>
+                    <input type="text" id="cat-name" class="form-input" required placeholder="مثال: فازات، كماليات، تحف">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">الأيقونة (إيموجي)</label>
+                    <label class="form-label">الأيقونة (إيموجي) *</label>
                     <input type="text" id="cat-icon" class="form-input" placeholder="مثال: 🏺 أو 👕" required>
                 </div>
-                <button type="submit" class="btn-primary">حفظ القسم</button>
+                <button type="submit" class="btn-primary" style="margin-top: 12px;">حفظ القسم</button>
             </form>
         </div>
     </div>
 
     <!-- Product Modal -->
     <div class="modal" id="product-modal">
-        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
-            <div class="modal-header">
-                <h3 id="modal-title">إضافة منتج</h3>
-                <button class="modal-close" onclick="closeModal('product-modal')">✕</button>
+        <div class="modal-content">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="modal-title" style="font-weight: 800;">إضافة منتج جديد</h3>
+                <button class="modal-close" onclick="closeModal('product-modal')" style="background: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
             </div>
             <form id="product-form">
                 <input type="hidden" id="prod-id">
                 <div class="form-group">
                     <label class="form-label">اسم المنتج *</label>
-                    <input type="text" id="prod-name" class="form-input" required>
+                    <input type="text" id="prod-name" class="form-input" required placeholder="ادخل اسم التحفة أو المنتج">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">السعر الأصلي (ج.م) *</label>
+                        <input type="number" id="prod-price" class="form-input" required placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">سعر العرض (اختياري)</label>
+                        <input type="number" id="prod-discount-price" class="form-input" placeholder="اتركه فارغاً إن لم يوجد">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">السعر الأصلي (ج.م) *</label>
-                    <input type="number" id="prod-price" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">سعر الخصم / العرض (اختياري - ج.م)</label>
-                    <input type="number" id="prod-discount-price" class="form-input" placeholder="اتركه فارغاً إذا لم يكن هناك خصم">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">التصنيف</label>
+                    <label class="form-label">التصنيف (القسم)</label>
                     <select id="prod-category" class="form-input"></select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">الوصف</label>
-                    <textarea id="prod-desc" class="form-textarea"></textarea>
+                    <label class="form-label">وصف المنتج</label>
+                    <textarea id="prod-desc" class="form-textarea" placeholder="ادخل تفاصيل ومواصفات المنتج..."></textarea>
                 </div>
                 
                 <div class="form-group" id="existing-images-group" style="display:none;">
@@ -236,15 +494,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">إضافة صور المنتج (يمكن اختيار أكثر من صورة) 📸</label>
+                    <label class="form-label">رفع صور المنتج 📸</label>
                     <input type="file" id="prod-image-file" class="form-input" accept="image/*" multiple>
-                    <small style="color: var(--text-muted); font-size: 0.75rem;">يمكنك تحديد عدة صور دفعة واحدة لرفعها على Supabase</small>
+                    <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 4px;">يمكنك اختيار صورة أو عدة صور دفعة واحدة</small>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">أو رابط صورة مباشرة (اختياري)</label>
                     <input type="url" id="prod-image-url-input" class="form-input" placeholder="https://example.com/image.jpg">
-                    <small style="color: var(--text-muted); font-size: 0.75rem;">يمكنك كتابة أو لصق رابط صورة مباشرة من الإنترنت هنا</small>
                 </div>
                 
                 <button type="submit" class="btn-primary" style="margin-top: 16px;">حفظ المنتج</button>
@@ -256,3 +513,4 @@
     <script src="../js/admin.js"></script>
 </body>
 </html>
+
