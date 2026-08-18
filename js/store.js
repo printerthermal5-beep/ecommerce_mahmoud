@@ -24,11 +24,11 @@ function initSubtleAutoScroll() {
     setTimeout(() => {
         if (!userInteractedWithScroll && window.scrollY < 20) {
             window.scrollBy({
-                top: 130,
+                top: 160,
                 behavior: 'smooth'
             });
         }
-    }, 1800);
+    }, 1600);
 }
 
 // --- Load Categories ---
