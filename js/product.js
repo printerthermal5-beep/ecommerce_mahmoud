@@ -164,9 +164,6 @@ function renderProductDetails() {
     // Fixed Bottom Action Bar
     html += `
         <div class="fixed-bottom-bar animate-in" style="animation-delay: 0.3s;">
-            <button class="share-btn" onclick="shareProduct()" title="مشاركة الرابط">
-                🔗
-            </button>
             <button class="btn-primary" onclick="addCurrentToCart(this)" ${!p.is_available ? 'disabled' : ''}>
                 ${p.is_available ? '<span>🛒</span> أضف للسلة' : 'غير متوفر حالياً'}
             </button>
