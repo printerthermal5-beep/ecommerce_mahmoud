@@ -2,7 +2,7 @@
 // Service Worker - الرايق لبيع الانتيكات والتحف
 // =============================================
 
-const CACHE_NAME = 'elrayek-store-v3';
+const CACHE_NAME = 'elrayek-store-v4';
 const STATIC_ASSETS = [
     './',
     './index.html',
@@ -11,6 +11,9 @@ const STATIC_ASSETS = [
     './wishlist.html',
     './orders.html',
     './checkout.html',
+    './favicon.ico',
+    './assets/icons/icon-192.png',
+    './assets/icons/icon-512.png',
     './css/style.css',
     './js/config.js',
     './js/store.js',
