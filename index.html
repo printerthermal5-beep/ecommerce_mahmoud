@@ -102,15 +102,20 @@
 
         <!-- Search & Sorting -->
         <div class="search-container animate-in" style="animation-delay: 0.1s;">
-            <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="search-input" placeholder="ابحث عن أنتيكات، تحف، فازات، كماليات...">
-                <select id="sort-select" style="background:transparent; border:none; color:var(--gold-light); font-size:0.8rem; outline:none; cursor:pointer; padding:0 8px;" onchange="handleSortChange(this.value)">
-                    <option value="default" style="background:var(--bg-card); color:var(--text-primary);">الأحدث 🆕</option>
-                    <option value="sale" style="background:var(--bg-card); color:var(--text-primary);">العروض فقط 🔥</option>
-                    <option value="price-low" style="background:var(--bg-card); color:var(--text-primary);">السعر: من الأقل للأعلى ⬆️</option>
-                    <option value="price-high" style="background:var(--bg-card); color:var(--text-primary);">السعر: من الأعلى للأقل ⬇️</option>
-                </select>
+            <div class="search-row">
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="ابحث عن أنتيكات، تحف، فازات...">
+                </div>
+                <div class="sort-wrapper">
+                    <select id="sort-select" class="sort-select" onchange="handleSortChange(this.value)">
+                        <option value="default">الأحدث 🆕</option>
+                        <option value="sale">العروض 🔥</option>
+                        <option value="price-low">السعر: الأقل ⬆️</option>
+                        <option value="price-high">السعر: الأعلى ⬇️</option>
+                    </select>
+                    <span class="sort-arrow">▾</span>
+                </div>
             </div>
         </div>
 
