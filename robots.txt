@@ -4,4 +4,4 @@ Disallow: /checkout.html
 Disallow: /cart.html
 Disallow: /orders.html
 
-Sitemap: https://printerthermal5-beep.github.io/ecommerce_mahmoud/sitemap.xml
+Sitemap: https://elrayek.qd.je/sitemap.xml

@@ -141,7 +141,7 @@ function triggerHaptic(pattern = 25) {
 // =============================================
 function shareApp() {
     triggerHaptic(30);
-    const url = 'https://printerthermal5-beep.github.io/ecommerce_mahmoud/';
+    const url = 'https://elrayek.qd.je/';
     const title = 'الرايق لبيع الانتيكات والتحف';
     const text = 'اكتشف تشكيلة حصرية من أفخم الأنتيكات والتحف والفازات والديكورات المنزلية النادرة من متجر الرايق 🏺✨';
 
