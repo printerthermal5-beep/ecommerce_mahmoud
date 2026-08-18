@@ -174,8 +174,34 @@ function renderProductDetails() {
     injectProductSchema(p);
 }
 
-// --- Google Rich Snippets JSON-LD Schema ---
+// --- Dynamic Canonical, Open Graph & Google Rich Snippets Schema ---
 function injectProductSchema(p) {
+    const productUrl = `https://elrayek.qd.je/product.html?id=${p.id}`;
+    const productTitle = `${p.name} | الرايق لبيع الانتيكات والتحف`;
+    const productDesc = p.description
+        ? p.description.replace(/[\r\n]+/g, ' ').substring(0, 160)
+        : 'تحفة عريقة ومصنوعة بإتقان من متجر الرايق لبيع الانتيكات والتحف.';
+    const productImage = p.image_url || 'https://elrayek.qd.je/assets/icons/icon-512.png';
+
+    // 1. Dynamic Canonical URL
+    let canonicalLink = document.querySelector("link[rel='canonical']");
+    if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.rel = 'canonical';
+        document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.href = productUrl;
+
+    // 2. Dynamic Open Graph Meta Tags
+    setMetaTag('property', 'og:title', productTitle);
+    setMetaTag('property', 'og:description', productDesc);
+    setMetaTag('property', 'og:image', productImage);
+    setMetaTag('property', 'og:url', productUrl);
+    setMetaTag('name', 'twitter:title', productTitle);
+    setMetaTag('name', 'twitter:description', productDesc);
+    setMetaTag('name', 'twitter:image', productImage);
+
+    // 3. Dynamic JSON-LD Schema
     let scriptEl = document.getElementById('product-json-ld');
     if (!scriptEl) {
         scriptEl = document.createElement('script');
@@ -188,12 +214,16 @@ function injectProductSchema(p) {
         "@context": "https://schema.org/",
         "@type": "Product",
         "name": p.name,
-        "image": p.image_url ? [p.image_url] : [],
-        "description": p.description || "تحفة عريقة ومصنوعة بإتقان من متجر الرايق لبيع الانتيكات والتحف",
+        "image": p.image_url ? [p.image_url] : [productImage],
+        "description": productDesc,
         "sku": p.id,
+        "brand": {
+            "@type": "Brand",
+            "name": "الرايق"
+        },
         "offers": {
             "@type": "Offer",
-            "url": window.location.href,
+            "url": productUrl,
             "priceCurrency": "EGP",
             "price": p.discount_price || p.price,
             "availability": p.is_available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
@@ -201,11 +231,27 @@ function injectProductSchema(p) {
         },
         "seller": {
             "@type": "Organization",
-            "name": "الرايق لبيع الانتيكات والتحف"
+            "name": "الرايق لبيع الانتيكات والتحف",
+            "telephone": "+2001222462607"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "شركة النور للبرمجيات",
+            "telephone": "+2001222462607"
         }
     };
 
     scriptEl.textContent = JSON.stringify(schemaData);
+}
+
+function setMetaTag(attribute, key, value) {
+    let tag = document.querySelector(`meta[${attribute}='${key}']`);
+    if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attribute, key);
+        document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', value);
 }
 
 // --- Load Related Products ---
