@@ -171,6 +171,41 @@ function renderProductDetails() {
     `;
     
     container.innerHTML = html;
+    injectProductSchema(p);
+}
+
+// --- Google Rich Snippets JSON-LD Schema ---
+function injectProductSchema(p) {
+    let scriptEl = document.getElementById('product-json-ld');
+    if (!scriptEl) {
+        scriptEl = document.createElement('script');
+        scriptEl.id = 'product-json-ld';
+        scriptEl.type = 'application/ld+json';
+        document.head.appendChild(scriptEl);
+    }
+    
+    const schemaData = {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": p.name,
+        "image": p.image_url ? [p.image_url] : [],
+        "description": p.description || "تحفة عريقة ومصنوعة بإتقان من متجر الرايق لبيع الانتيكات والتحف",
+        "sku": p.id,
+        "offers": {
+            "@type": "Offer",
+            "url": window.location.href,
+            "priceCurrency": "EGP",
+            "price": p.discount_price || p.price,
+            "availability": p.is_available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "itemCondition": "https://schema.org/NewCondition"
+        },
+        "seller": {
+            "@type": "Organization",
+            "name": "الرايق لبيع الانتيكات والتحف"
+        }
+    };
+
+    scriptEl.textContent = JSON.stringify(schemaData);
 }
 
 // --- Load Related Products ---
