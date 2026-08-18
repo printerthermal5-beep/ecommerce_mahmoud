@@ -201,7 +201,7 @@ function injectProductSchema(p) {
     setMetaTag('name', 'twitter:description', productDesc);
     setMetaTag('name', 'twitter:image', productImage);
 
-    // 3. Dynamic JSON-LD Schema
+    // 3. Dynamic JSON-LD Schema (Product + BreadcrumbList)
     let scriptEl = document.getElementById('product-json-ld');
     if (!scriptEl) {
         scriptEl = document.createElement('script');
@@ -210,38 +210,60 @@ function injectProductSchema(p) {
         document.head.appendChild(scriptEl);
     }
     
-    const schemaData = {
-        "@context": "https://schema.org/",
-        "@type": "Product",
-        "name": p.name,
-        "image": p.image_url ? [p.image_url] : [productImage],
-        "description": productDesc,
-        "sku": p.id,
-        "brand": {
-            "@type": "Brand",
-            "name": "الرايق"
+    const schemaGraph = [
+        {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": p.name,
+            "image": p.image_url ? [p.image_url] : [productImage],
+            "description": productDesc,
+            "sku": p.id,
+            "brand": {
+                "@type": "Brand",
+                "name": "الرايق"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": productUrl,
+                "priceCurrency": "EGP",
+                "price": p.discount_price || p.price,
+                "priceValidUntil": "2027-12-31",
+                "availability": p.is_available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                "itemCondition": "https://schema.org/NewCondition",
+                "seller": {
+                    "@type": "Organization",
+                    "name": "الرايق لبيع الانتيكات والتحف",
+                    "url": "https://elrayek.qd.je/"
+                }
+            }
         },
-        "offers": {
-            "@type": "Offer",
-            "url": productUrl,
-            "priceCurrency": "EGP",
-            "price": p.discount_price || p.price,
-            "availability": p.is_available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-            "itemCondition": "https://schema.org/NewCondition"
-        },
-        "seller": {
-            "@type": "Organization",
-            "name": "الرايق لبيع الانتيكات والتحف",
-            "telephone": "+2001222462607"
-        },
-        "creator": {
-            "@type": "Organization",
-            "name": "شركة النور للبرمجيات",
-            "telephone": "+2001222462607"
+        {
+            "@context": "https://schema.org/",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "الرئيسية",
+                    "item": "https://elrayek.qd.je/"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "الأنتيكات والتحف",
+                    "item": "https://elrayek.qd.je/index.html"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": p.name,
+                    "item": productUrl
+                }
+            ]
         }
-    };
+    ];
 
-    scriptEl.textContent = JSON.stringify(schemaData);
+    scriptEl.textContent = JSON.stringify(schemaGraph);
 }
 
 function setMetaTag(attribute, key, value) {

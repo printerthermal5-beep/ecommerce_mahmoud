@@ -14,15 +14,120 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://elrayek.qd.je/product.html</loc>
-    <lastmod>2026-08-18</lastmod>
-    <changefreq>daily</changefreq>
+    <loc>https://elrayek.qd.je/product.html?id=b1186a9e-e234-4a9a-9e72-86dd1f80cf20</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/ucpjdrzi8tr_1786635268252.jpg</image:loc>
+      <image:title>طاووس</image:title>
+    </image:image>
   </url>
   <url>
-    <loc>https://elrayek.qd.je/wishlist.html</loc>
-    <lastmod>2026-08-18</lastmod>
+    <loc>https://elrayek.qd.je/product.html?id=41fa5218-13c8-4928-aa98-133a2507dc78</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/bcf5kxauzgv_1786646202052.jpg</image:loc>
+      <image:title>طقم غزالة</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=58e69412-4c1b-49ac-b46d-e17bc8f86f5b</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/8t5j9s87k9k_1786646310555.jpg</image:loc>
+      <image:title>طقم زجاجي فاخر</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=a66930fe-d1dc-4ea2-856a-2aefe4a654fb</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/0rcufe9jrsmp_1786646396623.jpg</image:loc>
+      <image:title>طقم فازات ثلاث قطع</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=f8d59301-3186-4e6b-9ece-cfea0b0c81f0</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/jfo8drruyig_1786819229232.jpg</image:loc>
+      <image:title>طقم دونس</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=9c6db832-2879-4c70-8939-618b2109ce5d</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/ouz0vxydkb_1786819451789.jpg</image:loc>
+      <image:title>طقم زرافه ثلاثي</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=2cec2c09-400d-4d2e-b1d5-97f4c8fe1c5f</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/zblu2w1df_1786832755430.jpg</image:loc>
+      <image:title>قطعه ديكور مستورد</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=9a10f998-3239-4005-b660-3debc399e686</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/potuxslz03d_1786832993551.jpg</image:loc>
+      <image:title>عبد</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=a1547e2f-a7db-46eb-8ee0-5a89cc1c0332</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/zt41h8ax2z_1786635197845.jpg</image:loc>
+      <image:title>مجموعه افيال</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=dc9aecf6-dc4a-4147-ac88-cef8df3f346f</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/64hh41949l_1787000193354.jpg</image:loc>
+      <image:title>قناع الوجه</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=6ce62617-847b-440c-acb8-46f37af6e328</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/2ci516v9x8_1787000357094.jpg</image:loc>
+      <image:title>عروسه ورد</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=10c24366-301d-4d90-a82d-4de130fbd042</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/wuuc1qeli1_1787000461033.jpg</image:loc>
+      <image:title>شمعدان</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://elrayek.qd.je/product.html?id=73a9f5a8-841c-48d2-b032-43ad7809c6c2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://baprrfxmkcithsnjolgs.supabase.co/storage/v1/object/public/products/products/d5aiduwvu3_1787000564710.jpg</image:loc>
+      <image:title>جزع</image:title>
+    </image:image>
   </url>
 </urlset>
