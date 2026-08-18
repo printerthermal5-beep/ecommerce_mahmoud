@@ -25,7 +25,7 @@ function initSubtleAutoScroll() {
     setTimeout(() => {
         if (!userInteractedWithScroll && window.scrollY < 20) {
             window.scrollBy({
-                top: 180,
+                top: 200,
                 behavior: 'smooth'
             });
         }
