@@ -749,8 +749,26 @@ ul, ol { list-style: none; }
 }
 
 /* =============================================
-   FLOATING WHATSAPP BUTTON
+   FLOATING ACTION BUTTONS (SHARE & WHATSAPP)
    ============================================= */
+.floating-share-btn {
+    position: fixed; bottom: calc(var(--bottom-nav-h) + 80px); left: 16px; z-index: 95;
+    width: 50px; height: 50px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+    color: var(--bg-primary); display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; text-decoration: none; border: none; cursor: pointer;
+    box-shadow: var(--shadow-gold);
+    transition: var(--transition); animation: sharePulse 2s infinite;
+}
+.floating-share-btn:hover {
+    transform: scale(1.1); box-shadow: 0 6px 20px rgba(200, 164, 92, 0.6);
+}
+@keyframes sharePulse {
+    0% { box-shadow: 0 0 0 0 rgba(200, 164, 92, 0.5); }
+    70% { box-shadow: 0 0 0 12px rgba(200, 164, 92, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(200, 164, 92, 0); }
+}
+
 .floating-whatsapp-btn {
     position: fixed; bottom: calc(var(--bottom-nav-h) + 20px); left: 16px; z-index: 95;
     width: 50px; height: 50px; border-radius: 50%;

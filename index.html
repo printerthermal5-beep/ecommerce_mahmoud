@@ -78,7 +78,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- Floating WhatsApp Support Button -->
+    <!-- Floating Action Buttons -->
+    <button class="floating-share-btn" title="مشاركة المتجر" onclick="shareApp()">
+        🔗
+    </button>
     <a href="https://wa.me/2001222462607?text=مرحباً%20متجر%20الرايق،%20أريد%20الاستفسار%20عن%20منتجاتكم" target="_blank" rel="noopener" class="floating-whatsapp-btn" title="تحدث معنا على واتساب" onclick="triggerHaptic()">
         💬
     </a>
@@ -89,21 +92,8 @@
     </div>
 
     <!-- Header -->
-    <header class="header" style="top: var(--announcement-h);">
+    <header class="header" style="justify-content: center; top: var(--announcement-h);">
         <h1 class="header-title">الرايق لبيع الانتيكات والتحف</h1>
-        <div class="header-actions">
-            <button class="header-btn" onclick="shareApp()" title="مشاركة المتجر">
-                🔗
-            </button>
-            <a href="./wishlist.html" class="header-btn" title="المفضلة" onclick="triggerHaptic()">
-                ❤️
-                <span class="wishlist-badge">0</span>
-            </a>
-            <a href="./cart.html" class="header-btn" title="سلة المشتريات" onclick="triggerHaptic()">
-                🛒
-                <span class="cart-badge">0</span>
-            </a>
-        </div>
     </header>
 
     <!-- Main Content -->

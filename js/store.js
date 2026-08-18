@@ -134,7 +134,7 @@ function renderProducts() {
     if (!grid) return;
 
     let filtered = [...allProducts];
-    
+
     // Category filter
     if (activeCategory !== 'all') {
         filtered = filtered.filter(p => p.category_id === activeCategory);
@@ -190,9 +190,9 @@ function renderProducts() {
             <div class="product-media">
                 <a href="./product.html?id=${product.id}" onclick="saveClickedProduct('${product.id}')" style="display:block;">
                     ${product.image_url
-                        ? `<img class="product-image" src="${product.image_url}" alt="${product.name}" loading="lazy">`
-                        : `<div class="product-image-placeholder">🏺</div>`
-                    }
+                ? `<img class="product-image" src="${product.image_url}" alt="${product.name}" loading="lazy">`
+                : `<div class="product-image-placeholder">🏺</div>`
+            }
                 </a>
                 <button class="quick-view-card-btn" onclick="openQuickView('${product.id}')" title="معاينة سريعة">
                     👁️
@@ -307,10 +307,10 @@ function openQuickView(productId) {
         <div class="bottom-sheet">
             <button class="modal-close-btn" onclick="closeQuickView()">✕</button>
             <div style="display:flex; gap:16px; align-items:center; margin-bottom:16px;">
-                ${product.image_url 
-                    ? `<img src="${product.image_url}" style="width:100px; height:100px; object-fit:cover; border-radius:var(--radius-md);">`
-                    : `<div style="width:100px; height:100px; background:var(--bg-secondary); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:2.5rem;">🏺</div>`
-                }
+                ${product.image_url
+            ? `<img src="${product.image_url}" style="width:100px; height:100px; object-fit:cover; border-radius:var(--radius-md);">`
+            : `<div style="width:100px; height:100px; background:var(--bg-secondary); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:2.5rem;">🏺</div>`
+        }
                 <div>
                     <span style="font-size:0.75rem; color:var(--gold-light); font-weight:700;">${product.categories?.name || 'تحف وأنتيكات'}</span>
                     <h3 style="font-size:1.1rem; font-weight:700; margin:4px 0;">${product.name}</h3>
@@ -395,7 +395,7 @@ function initPullToRefresh() {
             const pullDist = Math.min(diffY * 0.45, 100);
             ptrElement.classList.add('visible');
             ptrElement.style.transform = `translateX(-50%) translateY(${pullDist - 50}px)`;
-            
+
             const rotation = Math.min((pullDist / threshold) * 180, 180);
             if (iconEl) iconEl.style.transform = `rotate(${rotation}deg)`;
 
