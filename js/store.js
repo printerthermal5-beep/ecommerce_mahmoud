@@ -5,12 +5,31 @@
 let allProducts = [];
 let allCategories = [];
 let activeCategory = 'all';
+let userInteractedWithScroll = false;
+
+['scroll', 'touchstart', 'mousedown', 'wheel'].forEach(evt => {
+    window.addEventListener(evt, () => {
+        userInteractedWithScroll = true;
+    }, { passive: true, once: true });
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
     CartManager.updateCartBadge();
     await loadCategories();
     await loadProducts();
+    initSubtleAutoScroll();
 });
+
+function initSubtleAutoScroll() {
+    setTimeout(() => {
+        if (!userInteractedWithScroll && window.scrollY < 20) {
+            window.scrollBy({
+                top: 130,
+                behavior: 'smooth'
+            });
+        }
+    }, 1800);
+}
 
 // --- Load Categories ---
 async function loadCategories() {
