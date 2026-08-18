@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadCategories();
     await loadProducts();
     initSubtleAutoScroll();
+    initPullToRefresh();
 });
 
 function initSubtleAutoScroll() {
@@ -356,4 +357,90 @@ if (searchInput) {
     searchInput.addEventListener('input', debounce(() => {
         renderProducts();
     }, 300));
+}
+
+// --- Pull to Refresh ---
+function initPullToRefresh() {
+    let startY = 0;
+    let currentY = 0;
+    let isPulling = false;
+    let isRefreshing = false;
+    const threshold = 70;
+
+    let ptrElement = document.getElementById('ptr-indicator');
+    if (!ptrElement) {
+        ptrElement = document.createElement('div');
+        ptrElement.id = 'ptr-indicator';
+        ptrElement.className = 'ptr-indicator';
+        ptrElement.innerHTML = `<span class="ptr-icon">🔄</span> <span class="ptr-text">اسحب للتحديث...</span>`;
+        document.body.appendChild(ptrElement);
+    }
+
+    const iconEl = ptrElement.querySelector('.ptr-icon');
+    const textEl = ptrElement.querySelector('.ptr-text');
+
+    window.addEventListener('touchstart', (e) => {
+        if (window.scrollY <= 5 && !isRefreshing) {
+            startY = e.touches[0].clientY;
+            isPulling = true;
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+        if (!isPulling || isRefreshing) return;
+        currentY = e.touches[0].clientY;
+        const diffY = currentY - startY;
+
+        if (diffY > 10 && window.scrollY <= 5) {
+            const pullDist = Math.min(diffY * 0.45, 100);
+            ptrElement.classList.add('visible');
+            ptrElement.style.transform = `translateX(-50%) translateY(${pullDist - 50}px)`;
+            
+            const rotation = Math.min((pullDist / threshold) * 180, 180);
+            if (iconEl) iconEl.style.transform = `rotate(${rotation}deg)`;
+
+            if (pullDist >= threshold) {
+                if (textEl) textEl.textContent = 'اترك للتحديث ✨';
+            } else {
+                if (textEl) textEl.textContent = 'اسحب للتحديث...';
+            }
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchend', async () => {
+        if (!isPulling || isRefreshing) return;
+        isPulling = false;
+
+        const diffY = currentY - startY;
+        const pullDist = Math.min(diffY * 0.45, 100);
+
+        if (pullDist >= threshold && window.scrollY <= 5) {
+            isRefreshing = true;
+            triggerHaptic(40);
+            ptrElement.classList.add('refreshing');
+            ptrElement.style.transform = 'translateX(-50%) translateY(20px)';
+            if (textEl) textEl.textContent = 'جاري التحديث...';
+            if (iconEl) iconEl.style.transform = 'none';
+
+            try {
+                await loadCategories();
+                await loadProducts();
+                showToast('تم تحديث المنتجات بنجاح ✨', 'success');
+            } catch (err) {
+                console.error('Refresh failed', err);
+            }
+
+            setTimeout(() => {
+                ptrElement.classList.remove('visible', 'refreshing');
+                ptrElement.style.transform = 'translateX(-50%) translateY(-100px)';
+                if (textEl) textEl.textContent = 'اسحب للتحديث...';
+                isRefreshing = false;
+            }, 600);
+        } else {
+            ptrElement.classList.remove('visible');
+            ptrElement.style.transform = 'translateX(-50%) translateY(-100px)';
+        }
+        startY = 0;
+        currentY = 0;
+    });
 }

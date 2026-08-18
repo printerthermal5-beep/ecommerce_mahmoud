@@ -130,9 +130,43 @@ const CartManager = {
 // =============================================
 // Haptic Feedback Helper
 // =============================================
-function triggerHaptic() {
+function triggerHaptic(pattern = 25) {
     if (navigator.vibrate) {
-        try { navigator.vibrate(35); } catch(e) {}
+        try { navigator.vibrate(pattern); } catch(e) {}
+    }
+}
+
+// =============================================
+// Web Share & Copy Utilities
+// =============================================
+function shareApp() {
+    triggerHaptic(30);
+    const url = 'https://printerthermal5-beep.github.io/ecommerce_mahmoud/';
+    const title = 'الرايق لبيع الانتيكات والتحف';
+    const text = 'اكتشف تشكيلة حصرية من أفخم الأنتيكات والتحف والفازات والديكورات المنزلية النادرة من متجر الرايق 🏺✨';
+
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: text,
+            url: url
+        }).catch(() => {
+            copyToClipboard(url, 'تم نسخ رابط المتجر بنجاح! 🔗');
+        });
+    } else {
+        copyToClipboard(url, 'تم نسخ رابط المتجر بنجاح! 🔗');
+    }
+}
+
+function copyToClipboard(text, successMsg = 'تم النسخ بنجاح!') {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(successMsg, 'success');
+        }).catch(() => {
+            showToast('تعذر النسخ تلقائياً', 'error');
+        });
+    } else {
+        showToast(successMsg, 'success');
     }
 }
 
