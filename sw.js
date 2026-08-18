@@ -1,8 +1,8 @@
 // =============================================
-// Service Worker - متجر النور
+// Service Worker - الرايق لبيع الانتيكات والتحف
 // =============================================
 
-const CACHE_NAME = 'alnour-store-v2';
+const CACHE_NAME = 'elrayek-store-v3';
 const STATIC_ASSETS = [
     './',
     './index.html',
@@ -19,7 +19,9 @@ const STATIC_ASSETS = [
     './js/wishlist.js',
     './js/orders.js',
     './js/checkout.js',
-    './manifest.json'
+    './manifest.json',
+    './robots.txt',
+    './sitemap.xml'
 ];
 
 // Install - Cache static assets
@@ -48,19 +50,13 @@ self.addEventListener('activate', (event) => {
 
 // Fetch - Network first, fallback to cache
 self.addEventListener('fetch', (event) => {
-    // Skip non-GET requests
     if (event.request.method !== 'GET') return;
-
-    // Skip non-HTTP(S) schemes (e.g. chrome-extension://)
     if (!event.request.url.startsWith('http://') && !event.request.url.startsWith('https://')) return;
-
-    // Skip Supabase API requests (always go to network)
     if (event.request.url.includes('supabase.co')) return;
 
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                // Clone and cache successful responses
                 if (response.status === 200) {
                     const responseClone = response.clone();
                     caches.open(CACHE_NAME).then((cache) => {
@@ -70,7 +66,6 @@ self.addEventListener('fetch', (event) => {
                 return response;
             })
             .catch(() => {
-                // Fallback to cache
                 return caches.match(event.request);
             })
     );

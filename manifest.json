@@ -1,7 +1,7 @@
 {
-    "name": "متجر النور - كماليات وأنتيكات",
-    "short_name": "النور",
-    "description": "متجر النور لبيع أفخم الكماليات والأنتيكات والتحف والفازات",
+    "name": "الرايق لبيع الانتيكات والتحف",
+    "short_name": "الرايق للأنتيكات",
+    "description": "متجر الرايق لبيع أفخم الأنتيكات والتحف والفازات والكماليات المنزلية النادرة",
     "start_url": "./",
     "display": "standalone",
     "background_color": "#0A0A0F",
@@ -9,7 +9,7 @@
     "orientation": "portrait-primary",
     "dir": "rtl",
     "lang": "ar",
-    "categories": ["shopping"],
+    "categories": ["shopping", "lifestyle"],
     "icons": [
         {
             "src": "assets/icons/icon-72.png",

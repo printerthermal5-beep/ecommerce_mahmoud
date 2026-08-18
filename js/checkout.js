@@ -179,7 +179,7 @@ function showSuccessState(orderNumber, customerData, cart, totalAmount) {
 }
 
 function formatWhatsAppMessage(orderNumber, customer, cart, total) {
-    let msg = `🛒 *طلب جديد من متجر النور* (#${orderNumber})\n`;
+    let msg = `🛒 *طلب جديد من الرايق لبيع الانتيكات والتحف* (#${orderNumber})\n`;
     msg += `━━━━━━━━━━━━━━━\n`;
     msg += `👤 الاسم: ${customer.customer_name}\n`;
     msg += `📱 التليفون: ${customer.customer_phone}\n`;

@@ -42,11 +42,43 @@ async function loadProductDetails(id) {
     if (!error && data) {
         currentProduct = data;
         renderProductDetails();
+        injectProductSchema(data);
         loadRelatedProducts(data.category_id, data.id); // Non-blocking background fetch
     } else if (!currentProduct) {
         console.error('Error fetching product:', error);
         showError('المنتج غير موجود أو تم حذفه');
     }
+}
+
+function injectProductSchema(p) {
+    if (!p) return;
+    document.title = `${p.name} | الرايق لبيع الانتيكات والتحف`;
+    let script = document.getElementById('product-jsonld');
+    if (!script) {
+        script = document.createElement('script');
+        script.id = 'product-jsonld';
+        script.type = 'application/ld+json';
+        document.head.appendChild(script);
+    }
+    const schema = {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": p.name,
+        "image": p.images && p.images.length ? p.images : (p.image_url ? [p.image_url] : []),
+        "description": p.description || p.name,
+        "brand": {
+            "@type": "Brand",
+            "name": "الرايق لبيع الانتيكات والتحف"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": window.location.href,
+            "priceCurrency": "EGP",
+            "price": p.discount_price || p.price,
+            "availability": p.is_available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+        }
+    };
+    script.textContent = JSON.stringify(schema);
 }
 
 function renderProductDetails() {
@@ -259,7 +291,7 @@ function shareProduct() {
     
     const url = window.location.href;
     const title = currentProduct.name;
-    const text = `شاهد هذا المنتج الرائع من متجر النور: ${title}`;
+    const text = `شاهد هذه التحفة الرائعة من متجر الرايق لبيع الانتيكات والتحف: ${title}`;
     
     if (navigator.share) {
         navigator.share({

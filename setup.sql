@@ -1,5 +1,5 @@
 -- ================================================
--- متجر النور - Supabase Database Setup
+-- الرايق لبيع الانتيكات والتحف - Supabase Database Setup
 -- ================================================
 -- Run this SQL in your Supabase SQL Editor:
 -- https://baprrfxmkcithsnjolgs.supabase.co → SQL Editor → New Query
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- 5. Store Settings Table
 CREATE TABLE IF NOT EXISTS store_settings (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    store_name TEXT DEFAULT 'متجر النور',
+    store_name TEXT DEFAULT 'الرايق لبيع الانتيكات والتحف',
     store_logo TEXT,
     whatsapp_number TEXT DEFAULT '01222462607',
     delivery_fee NUMERIC DEFAULT 0,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS store_settings (
 
 -- Insert default settings
 INSERT INTO store_settings (store_name, whatsapp_number, delivery_fee)
-VALUES ('متجر النور', '01222462607', 0);
+VALUES ('الرايق لبيع الانتيكات والتحف', '01222462607', 0);
 
 -- ================================================
 -- Row Level Security (RLS) Policies

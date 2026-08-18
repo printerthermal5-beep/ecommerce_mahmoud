@@ -8,7 +8,7 @@ const path = require('path');
 
 const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
 const OUT_DIR = path.join(__dirname, '..', 'assets', 'icons');
-// متجر النور gold palette
+// الرايق لبيع الانتيكات والتحف gold palette
 const GOLD = [200, 164, 92];
 const DARK = [28, 26, 34];
 

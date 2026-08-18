@@ -1,5 +1,5 @@
 // =============================================
-// Wishlist Page Logic - متجر النور
+// Wishlist Page Logic - الرايق لبيع الانتيكات والتحف
 // =============================================
 
 document.addEventListener('DOMContentLoaded', () => {

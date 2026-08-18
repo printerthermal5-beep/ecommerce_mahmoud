@@ -1,5 +1,5 @@
 // =============================================
-// Admin Logic - متجر النور (Mobile Responsive UX)
+// Admin Logic - الرايق لبيع الانتيكات والتحف (Mobile Responsive UX)
 // =============================================
 
 let adminCategories = [];
@@ -725,7 +725,7 @@ async function exportOrdersToCSV() {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `طلبات_متجر_النور_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `طلبات_الرايق_للانتيكات_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

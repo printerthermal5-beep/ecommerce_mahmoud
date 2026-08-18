@@ -1,5 +1,5 @@
 // =============================================
-// My Orders Page Logic - متجر النور
+// My Orders Page Logic - الرايق لبيع الانتيكات والتحف
 // =============================================
 
 document.addEventListener('DOMContentLoaded', () => {

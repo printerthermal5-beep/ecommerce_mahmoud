@@ -17,18 +17,18 @@ function renderStoreFooter() {
     if (!footers || footers.length === 0) return;
 
     const footerHtml = `
-        <div class="footer-logo">✨ متجر النور للأنتيكات ✨</div>
-        <p class="footer-desc">أفخم التحف والكماليات والفازات النادرة لمنزل يفيض بالفخامة والأصالة.</p>
+        <div class="footer-logo">✨ الرايق لبيع الأنتيكات والتحف ✨</div>
+        <p class="footer-desc">تشكيلة حصرية من أفخم الأنتيكات والتحف النادرة والفازات والديكورات المنزلية الفاخرة.</p>
         <div class="footer-socials">
             <a href="https://wa.me/${WHATSAPP_NUMBER}" target="_blank" rel="noopener" class="social-btn whatsapp" onclick="triggerHaptic()">
-                <span class="social-icon">💬</span> واتساب
+                <span class="social-icon">💬</span> تواصل عبر واتساب
             </a>
             <a href="${FACEBOOK_URL}" target="_blank" rel="noopener" class="social-btn facebook" onclick="triggerHaptic()">
-                <span class="social-icon">📘</span> فيسبوك
+                <span class="social-icon">📘</span> صفحتنا على فيسبوك
             </a>
         </div>
         <div class="footer-copy">
-            © 2026 متجر النور. جميع الحقوق محفوظة.
+            © 2026 الرايق لبيع الأنتيكات والتحف. جميع الحقوق محفوظة.
         </div>
     `;
 
