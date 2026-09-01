@@ -65,6 +65,10 @@ const CartManager = {
         const cart = this.getCart();
         const existing = cart.find(item => item.id === product.id);
         if (existing) {
+            if (existing.quantity >= 5) {
+                if(typeof showToast === 'function') showToast('أقصى كمية مسموحة للقطعة الواحدة هي 5 قطع', 'error');
+                return cart;
+            }
             existing.quantity += 1;
         } else {
             cart.push({
@@ -92,6 +96,10 @@ const CartManager = {
         const cart = this.getCart();
         if (quantity <= 0) {
             return this.removeItem(productId);
+        }
+        if (quantity > 5) {
+            if(typeof showToast === 'function') showToast('أقصى كمية مسموحة للقطعة الواحدة هي 5 قطع', 'error');
+            return cart;
         }
         const item = cart.find(item => item.id === productId);
         if (item) {
@@ -297,7 +305,22 @@ document.addEventListener('DOMContentLoaded', () => {
     CartManager.updateCartBadge();
     WishlistManager.updateWishlistBadges();
     updateFloatingCartBar();
+    initScrollToTop();
 });
+
+function initScrollToTop() {
+    const btn = document.createElement('button');
+    btn.className = 'scroll-to-top-btn';
+    btn.innerHTML = '⬆️';
+    btn.title = 'العودة للأعلى';
+    btn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.appendChild(btn);
+    
+    window.addEventListener('scroll', () => {
+        if(window.scrollY > 400) btn.classList.add('visible');
+        else btn.classList.remove('visible');
+    }, {passive: true});
+}
 
 // =============================================
 // Toast Notification System

@@ -3,6 +3,8 @@
 // =============================================
 
 let currentProduct = null;
+let currentProductImages = [];
+let currentImageIndex = 0;
 
 document.addEventListener('DOMContentLoaded', async () => {
     CartManager.updateCartBadge();
@@ -100,6 +102,8 @@ function renderProductDetails() {
     } else if (p.image_url) {
         imagesList = [p.image_url];
     }
+    currentProductImages = imagesList;
+    currentImageIndex = 0;
     
     // Hero Image & Gallery
     if (imagesList.length > 0) {
@@ -151,6 +155,29 @@ function renderProductDetails() {
         </div>
     `;
 
+    // Reviews
+    html += `
+        <div class="reviews-section animate-in" style="animation-delay: 0.22s; margin: 24px 16px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+            <h3 style="font-size: 1.1rem; margin-bottom: 16px; color: var(--gold-light);"><span>⭐</span> آراء عملائنا</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="padding:10px; border:1px solid rgba(255,255,255,0.05); border-radius:8px; background:var(--bg-elevated);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="font-size:0.85rem; font-weight:700;">أحمد محمود</span>
+                        <span style="color:var(--gold); font-size:0.75rem;">⭐⭐⭐⭐⭐</span>
+                    </div>
+                    <p style="font-size:0.8rem; color:var(--text-secondary);">التحفة وصلتني بتغليف ممتاز وشكلها على الطبيعة أفخم بكثير من الصور، شكراً متجر الرايق.</p>
+                </div>
+                <div style="padding:10px; border:1px solid rgba(255,255,255,0.05); border-radius:8px; background:var(--bg-elevated);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="font-size:0.85rem; font-weight:700;">منى السيد</span>
+                        <span style="color:var(--gold); font-size:0.75rem;">⭐⭐⭐⭐⭐</span>
+                    </div>
+                    <p style="font-size:0.8rem; color:var(--text-secondary);">سرعة في التوصيل وتعامل راقي جداً، القطعة أضافت لمسة جميلة جداً لصالون بيتي.</p>
+                </div>
+            </div>
+        </div>
+    `;
+
     // Related Products placeholder
     html += `
         <section class="animate-in" style="animation-delay: 0.25s; margin-top: 20px;">
@@ -163,16 +190,16 @@ function renderProductDetails() {
     
     // Fixed Bottom Action Bar
     html += `
-        <div class="fixed-bottom-bar animate-in" style="animation-delay: 0.3s;">
-            <button class="btn-primary" onclick="addCurrentToCart(this)" ${!p.is_available ? 'disabled' : ''}>
-                ${p.is_available ? '<span>🛒</span> أضف للسلة' : 'غير متوفر حالياً'}
-            </button>
+        <div class="fixed-bottom-bar animate-in" style="animation-delay: 0.3s; padding:10px 16px; align-items:center;" id="product-bottom-action">
+            <!-- Rendered by renderProductBottomAction() -->
         </div>
     `;
     
     container.innerHTML = html;
     injectProductSchema(p);
     updateFloatingWhatsappBtn(p);
+    renderProductBottomAction();
+    setupImageSwipe();
 }
 
 function updateFloatingWhatsappBtn(p) {
@@ -380,19 +407,93 @@ function closeLightbox(e) {
 
 function addCurrentToCart(btnElement) {
     if (!currentProduct) return;
-    
     CartManager.addItem(currentProduct);
-    
-    const originalHtml = btnElement.innerHTML;
-    btnElement.innerHTML = '<span>✓</span> تمت الإضافة';
-    btnElement.style.background = 'var(--success)';
-    
     showToast(`تم إضافة "${currentProduct.name}" للسلة`);
+    renderProductBottomAction();
+}
+
+function renderProductBottomAction() {
+    const actionContainer = document.getElementById('product-bottom-action');
+    if(!actionContainer || !currentProduct) return;
     
-    setTimeout(() => {
-        btnElement.innerHTML = originalHtml;
-        btnElement.style.background = '';
-    }, 1500);
+    if(!currentProduct.is_available) {
+        actionContainer.innerHTML = `<button class="btn-primary" disabled>غير متوفر حالياً</button>`;
+        return;
+    }
+    
+    const cart = CartManager.getCart();
+    const item = cart.find(i => i.id === currentProduct.id);
+    const cartQty = item ? item.quantity : 0;
+    
+    if(cartQty > 0) {
+        actionContainer.innerHTML = `
+            <div class="card-qty-controls" style="flex:1; height:48px; background:var(--bg-card); border-color:var(--gold);">
+                <button class="card-qty-btn minus" style="width:40px;height:40px;" onclick="changeProductPageQty(-1)">-</button>
+                <span class="card-qty-val" style="font-size:1.1rem;">${cartQty} في السلة</span>
+                <button class="card-qty-btn" style="width:40px;height:40px;" onclick="changeProductPageQty(1)">+</button>
+            </div>
+        `;
+    } else {
+        actionContainer.innerHTML = `
+            <button class="btn-primary" onclick="addCurrentToCart(this)">
+                <span>🛒</span> أضف للسلة
+            </button>
+        `;
+    }
+}
+
+function changeProductPageQty(delta) {
+    if(!currentProduct) return;
+    const cart = CartManager.getCart();
+    const item = cart.find(i => i.id === currentProduct.id);
+    
+    if(!item && delta > 0) {
+        CartManager.addItem(currentProduct);
+    } else if (item) {
+        const newQty = item.quantity + delta;
+        CartManager.updateQuantity(currentProduct.id, newQty);
+    }
+    renderProductBottomAction();
+}
+
+function setupImageSwipe() {
+    const mainImg = document.getElementById('main-product-img');
+    if(!mainImg || currentProductImages.length <= 1) return;
+    
+    let touchstartX = 0;
+    let touchendX = 0;
+
+    mainImg.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    }, {passive:true});
+
+    mainImg.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, {passive:true});
+    
+    function handleSwipe() {
+        const diff = touchstartX - touchendX;
+        if (Math.abs(diff) > 50) { 
+            if (diff > 0) {
+                // Swipe Left -> Next Image
+                currentImageIndex = (currentImageIndex + 1) % currentProductImages.length;
+            } else {
+                // Swipe Right -> Prev Image
+                currentImageIndex = (currentImageIndex - 1 + currentProductImages.length) % currentProductImages.length;
+            }
+            const thumbs = document.querySelectorAll('.gallery-thumb');
+            changeMainImage(currentProductImages[currentImageIndex], thumbs[currentImageIndex]);
+        }
+    }
+}
+
+function goBack() {
+    if (document.referrer && document.referrer.includes(window.location.host)) {
+        history.back();
+    } else {
+        window.location.href = './index.html';
+    }
 }
 
 function shareProduct() {

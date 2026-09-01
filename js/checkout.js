@@ -17,6 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedCustomer.name) document.getElementById('cust-name').value = savedCustomer.name;
         if (savedCustomer.phone) document.getElementById('cust-phone').value = savedCustomer.phone;
         if (savedCustomer.address) document.getElementById('cust-address').value = savedCustomer.address;
+        if (savedCustomer.notes) {
+            const notesEl = document.getElementById('cust-notes');
+            if(notesEl) notesEl.value = savedCustomer.notes;
+        }
     }
 
     renderOrderSummary(cart);
@@ -24,6 +28,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('checkout-form');
     if (form) {
         form.addEventListener('submit', handleCheckoutSubmit);
+        
+        // Auto-save form data on input
+        const inputs = form.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                CustomerManager.saveInfo({
+                    name: document.getElementById('cust-name').value.trim(),
+                    phone: document.getElementById('cust-phone').value.trim(),
+                    address: document.getElementById('cust-address').value.trim(),
+                    notes: document.getElementById('cust-notes')?.value.trim() || ''
+                });
+            });
+        });
     }
 });
 
