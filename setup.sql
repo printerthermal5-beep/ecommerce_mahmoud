@@ -60,17 +60,18 @@ CREATE TABLE IF NOT EXISTS store_settings (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     store_name TEXT DEFAULT 'الرايق لبيع الانتيكات والتحف',
     store_logo TEXT,
-    whatsapp_number TEXT DEFAULT '01222462607',
-    delivery_fee NUMERIC DEFAULT 0,
+    whatsapp_number TEXT DEFAULT '01062660361',
+    delivery_fee DECIMAL(10, 2) DEFAULT 0,
     min_order NUMERIC DEFAULT 0,
     store_announcement TEXT,
     is_store_open BOOLEAN DEFAULT true,
-    updated_at TIMESTAMPTZ DEFAULT now()
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Insert default settings
 INSERT INTO store_settings (store_name, whatsapp_number, delivery_fee)
-VALUES ('الرايق لبيع الانتيكات والتحف', '01222462607', 0);
+VALUES ('الرايق لبيع الانتيكات والتحف', '01062660361', 0);
 
 -- ================================================
 -- Row Level Security (RLS) Policies
