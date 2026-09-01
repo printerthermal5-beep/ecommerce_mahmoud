@@ -5,7 +5,7 @@
 const SUPABASE_URL = 'https://baprrfxmkcithsnjolgs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_egqZEvdO5jFCaEg6PTs9ow_E9YZFhMr';
 const WHATSAPP_NUMBER = '201062660361';
-const FACEBOOK_URL = 'https://www.facebook.com/share/1DisGfw3vD/'; // Facebook Page Link
+const FACEBOOK_URL = 'https://www.facebook.com/profile.php?id=61593874370737'; // Facebook Page Link
 
 // Initialize Supabase Client
 const { createClient } = supabase;
