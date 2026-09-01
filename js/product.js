@@ -172,6 +172,15 @@ function renderProductDetails() {
     
     container.innerHTML = html;
     injectProductSchema(p);
+    updateFloatingWhatsappBtn(p);
+}
+
+function updateFloatingWhatsappBtn(p) {
+    const btn = document.querySelector('.floating-whatsapp-btn');
+    if (!btn || !p) return;
+    const priceText = formatPrice(p.discount_price || p.price);
+    const msg = `مرحباً متجر الرايق، أريد الاستفسار عن المنتج:\n📌 *${p.name}*\n💰 السعر: ${priceText}\n🔗 الرابط: ${window.location.href}`;
+    btn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 }
 
 // --- Dynamic Canonical, Open Graph & Google Rich Snippets Schema ---
