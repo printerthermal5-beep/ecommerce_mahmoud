@@ -149,3 +149,31 @@ INSERT INTO categories (name, icon, sort_order) VALUES
     ('ساعات حائط', '🕐', 4),
     ('إطارات صور', '🖼️', 5),
     ('ديكورات منزلية', '🏠', 6);
+
+-- ================================================
+-- 6. Product Reviews Table
+-- ================================================
+CREATE TABLE IF NOT EXISTS product_reviews (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    product_id UUID REFERENCES products(id) ON DELETE CASCADE,
+    customer_name TEXT NOT NULL,
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    is_approved BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE product_reviews ENABLE ROW LEVEL SECURITY;
+
+-- Public can read approved reviews
+CREATE POLICY "Anyone can read approved reviews" ON product_reviews
+    FOR SELECT USING (is_approved = true);
+
+-- Anyone can insert a review (no auth needed)
+CREATE POLICY "Anyone can create a review" ON product_reviews
+    FOR INSERT WITH CHECK (true);
+
+-- Authenticated users can manage reviews
+CREATE POLICY "Authenticated users can manage reviews" ON product_reviews
+    FOR ALL USING (auth.role() = 'authenticated');
+

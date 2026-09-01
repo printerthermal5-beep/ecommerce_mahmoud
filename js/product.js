@@ -29,6 +29,7 @@ async function loadProductDetails(id) {
             currentProduct = JSON.parse(cached);
             renderProductDetails();
             loadRelatedProducts(currentProduct.category_id, currentProduct.id); // Non-blocking
+            loadProductReviews(currentProduct.id);
         } catch (e) {
             console.error('Error parsing cached product:', e);
         }
@@ -46,6 +47,7 @@ async function loadProductDetails(id) {
         renderProductDetails();
         injectProductSchema(data);
         loadRelatedProducts(data.category_id, data.id); // Non-blocking background fetch
+        loadProductReviews(data.id);
     } else if (!currentProduct) {
         console.error('Error fetching product:', error);
         showError('المنتج غير موجود أو تم حذفه');
@@ -159,21 +161,28 @@ function renderProductDetails() {
     html += `
         <div class="reviews-section animate-in" style="animation-delay: 0.22s; margin: 24px 16px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);">
             <h3 style="font-size: 1.1rem; margin-bottom: 16px; color: var(--gold-light);"><span>⭐</span> آراء عملائنا</h3>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <div style="padding:10px; border:1px solid rgba(255,255,255,0.05); border-radius:8px; background:var(--bg-elevated);">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                        <span style="font-size:0.85rem; font-weight:700;">أحمد محمود</span>
-                        <span style="color:var(--gold); font-size:0.75rem;">⭐⭐⭐⭐⭐</span>
+            
+            <!-- Submit Review Form -->
+            <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                <form id="review-form" onsubmit="submitProductReview(event)">
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <input type="text" id="review-name" placeholder="الاسم" required class="form-input" style="flex:1; padding:8px; font-size:0.85rem;">
+                        <select id="review-rating" class="form-input" style="width:70px; padding:8px; font-size:0.85rem;">
+                            <option value="5">5 ⭐</option>
+                            <option value="4">4 ⭐</option>
+                            <option value="3">3 ⭐</option>
+                            <option value="2">2 ⭐</option>
+                            <option value="1">1 ⭐</option>
+                        </select>
                     </div>
-                    <p style="font-size:0.8rem; color:var(--text-secondary);">التحفة وصلتني بتغليف ممتاز وشكلها على الطبيعة أفخم بكثير من الصور، شكراً متجر الرايق.</p>
-                </div>
-                <div style="padding:10px; border:1px solid rgba(255,255,255,0.05); border-radius:8px; background:var(--bg-elevated);">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                        <span style="font-size:0.85rem; font-weight:700;">منى السيد</span>
-                        <span style="color:var(--gold); font-size:0.75rem;">⭐⭐⭐⭐⭐</span>
-                    </div>
-                    <p style="font-size:0.8rem; color:var(--text-secondary);">سرعة في التوصيل وتعامل راقي جداً، القطعة أضافت لمسة جميلة جداً لصالون بيتي.</p>
-                </div>
+                    <textarea id="review-comment" placeholder="أضف رأيك في المنتج..." required class="form-textarea" style="width:100%; min-height:60px; margin-bottom:10px; padding:8px; font-size:0.85rem;"></textarea>
+                    <button type="submit" class="btn-primary" id="submit-review-btn" style="padding: 8px 16px; font-size: 0.85rem; border-radius:var(--radius-md);">إرسال التقييم</button>
+                </form>
+            </div>
+
+            <!-- Reviews List -->
+            <div id="product-reviews-container" style="display:flex; flex-direction:column; gap:12px;">
+                <div style="text-align:center; padding:10px; color:var(--text-muted); font-size:0.8rem;">جاري تحميل الآراء...</div>
             </div>
         </div>
     `;
@@ -538,3 +547,72 @@ function showError(msg) {
     }
 }
 
+async function loadProductReviews(productId) {
+    const container = document.getElementById('product-reviews-container');
+    if(!container) return;
+
+    const { data, error } = await db
+        .from('product_reviews')
+        .select('*')
+        .eq('product_id', productId)
+        .eq('is_approved', true)
+        .order('created_at', { ascending: false });
+
+    if(error) {
+        console.error('Error loading reviews:', error);
+        container.innerHTML = `<div style="text-align:center; padding:10px; color:var(--text-muted); font-size:0.8rem;">حدث خطأ في تحميل التقييمات</div>`;
+        return;
+    }
+
+    if(!data || data.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:10px; color:var(--text-muted); font-size:0.8rem;">لا توجد تقييمات حتى الآن. كن أول من يكتب رأيه!</div>`;
+        return;
+    }
+
+    container.innerHTML = data.map(r => `
+        <div style="padding:10px; border:1px solid rgba(255,255,255,0.05); border-radius:8px; background:var(--bg-elevated);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-size:0.85rem; font-weight:700;">${r.customer_name}</span>
+                <span style="color:var(--gold); font-size:0.75rem;">${'⭐'.repeat(r.rating)}</span>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">${r.comment}</p>
+        </div>
+    `).join('');
+}
+
+async function submitProductReview(e) {
+    e.preventDefault();
+    if(!currentProduct) return;
+
+    const btn = document.getElementById('submit-review-btn');
+    const nameInput = document.getElementById('review-name');
+    const ratingInput = document.getElementById('review-rating');
+    const commentInput = document.getElementById('review-comment');
+
+    btn.disabled = true;
+    btn.innerHTML = 'جاري الإرسال... ⏳';
+
+    const newReview = {
+        product_id: currentProduct.id,
+        customer_name: nameInput.value.trim(),
+        rating: parseInt(ratingInput.value),
+        comment: commentInput.value.trim(),
+        is_approved: true
+    };
+
+    const { error } = await db.from('product_reviews').insert([newReview]);
+
+    if(error) {
+        console.error('Error submitting review:', error);
+        showToast('حدث خطأ أثناء إرسال التقييم', 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'إرسال التقييم';
+    } else {
+        showToast('تم إرسال التقييم بنجاح', 'success');
+        nameInput.value = '';
+        commentInput.value = '';
+        btn.disabled = false;
+        btn.innerHTML = 'إرسال التقييم';
+        loadProductReviews(currentProduct.id);
+    }
+}
